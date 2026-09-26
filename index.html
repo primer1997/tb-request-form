@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>NTEP Smart Form — क्षयरोग नमुना तपासणी अर्ज</title>
+<title>TB Request Form — क्षयरोग नमुना तपासणी अर्ज</title>
 <meta name="theme-color" content="#0b3b4a">
 <meta name="color-scheme" content="light">
 <style>
@@ -161,28 +161,28 @@ details.acc .acc-body{padding:4px 15px 16px;animation:fadeUp .3s both}
 .mbtn.no{background:var(--chip)}
 .mbtn.yes{background:var(--red);color:#fff}
 
-/* ---------- PRINT : official paper layout ---------- */
+/* ---------- PRINT : official Annexure 15A, 2 pages ---------- */
 #printView{display:none}
+@page{size:A4;margin:6mm}
 @media print{
   body{background:#fff}
   .shell,#toast,.mback{display:none !important}
   #printView{display:block !important;color:#000}
 }
-.pdoc{font-family:"Noto Sans Devanagari",Arial,sans-serif;font-size:11px;line-height:1.45;color:#000;max-width:100%}
-.pdoc h1{font-size:16px;text-align:center;margin-bottom:2px}
-.pdoc .psub{text-align:center;font-size:11px;margin-bottom:2px}
-.pdoc .pmr{text-align:center;font-size:12px;font-weight:bold;margin-bottom:8px}
-.psec{border:1.5px solid #000;margin-bottom:8px;page-break-inside:avoid}
-.psec>h2{font-size:12px;background:#e8e8e8;padding:4px 8px;border-bottom:1px solid #000;margin:0}
-.prow{display:flex;border-bottom:1px solid #bbb;padding:3px 8px;gap:8px}
-.prow:last-child{border-bottom:none}
-.prow .pl{font-weight:bold;min-width:190px;flex:none}
-.prow .pv{flex:1}
-.pgrid{display:flex;flex-wrap:wrap}
-.pgrid .prow{width:50%}
-.cb{font-size:13px}
-.pfoot{display:flex;justify-content:space-between;margin-top:14px;font-size:11px}
-.pfoot .sig{border-top:1px solid #000;padding-top:4px;width:30%;text-align:center}
+.pdoc{font-family:Arial,"Noto Sans Devanagari",sans-serif;font-size:8pt;line-height:1.25;color:#000;max-width:100%}
+.pdoc h1{font-size:12pt;text-align:center;margin:0}
+.pdoc .psub{text-align:center;font-size:8.5pt}
+.pdoc .pannex{text-align:center;font-size:9pt;font-weight:bold;margin:2px 0 4px}
+.pg2{page-break-before:always}
+.ptab{width:100%;border-collapse:collapse;margin-bottom:3px;page-break-inside:avoid}
+.ptab td,.ptab th{border:1px solid #000;padding:1.5px 3px;vertical-align:top;font-size:8pt}
+.ptab th.sech{background:#e8e8e8;text-align:center;font-size:8.5pt;padding:2px 4px}
+.ptab th.c,.ptab td.c{text-align:center}
+.bx{display:inline-block;min-width:8px;height:8px;border:1.1px solid #000;font-size:7px;line-height:8px;text-align:center;vertical-align:-1px;margin-right:2px;font-weight:bold}
+.pline{margin:2px 0 3px;font-size:8pt}
+.rsig{float:right}
+.pfoot{display:flex;justify-content:space-between;margin-top:6px;font-size:8pt;page-break-inside:avoid}
+.pfoot .sig{border-top:1px solid #000;padding-top:3px;width:31%;text-align:center}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
 }
@@ -198,7 +198,7 @@ details.acc .acc-body{padding:4px 15px 16px;animation:fadeUp .3s both}
       <div class="hero-in">
         <div class="brand-row">
           <div class="logo">🫁</div>
-          <h1>NTEP Smart Form<span class="mr">क्षयरोग नमुना तपासणी स्मार्ट अर्ज</span></h1>
+          <h1>TB Request Form<span class="mr">क्षयरोग नमुना तपासणी स्मार्ट अर्ज</span></h1>
         </div>
         <div class="hero-stats">
           <div class="hstat"><b id="statTotal">0</b><span>Saved forms<br>जतन केलेले अर्ज</span></div>
@@ -721,124 +721,177 @@ function prow(label, val){
   return '<div class="prow"><span class="pl">' + esc(label) + '</span><span class="pv">' + esc(val || '—') + '</span></div>';
 }
 
+/* ---------- PRINT helpers : official Annexure 15A ---------- */
+function pbx(v){ return '<span class="bx">' + (v ? '&#10003;' : '&nbsp;') + '</span>'; }
+function pval(v){ return esc(v == null ? '' : v); }
+function pdate(iso){ return iso ? esc(fmtDate(iso)) : '&nbsp;'; }
+function prb(val, opts){
+  return opts.map(function(o){ return '<span class="cb">' + pbx(val === o) + ' ' + esc(o) + '</span>'; }).join('&nbsp;&nbsp;');
+}
+function pck(keys, d){
+  return keys.map(function(k){ return '<span class="cb">' + pbx(d[k[0]]) + ' ' + esc(k[1]) + '</span>'; }).join('&nbsp;&nbsp;');
+}
+function microRow(label, d, p){
+  return '<tr><td>' + label + '</td><td class="c">' + pval(d[p + 'srno']) + '</td>'
+    + '<td class="c">' + pbx(d[p + 'S']) + ' S &nbsp;' + pbx(d[p + 'M']) + ' M &nbsp;' + pbx(d[p + 'B']) + ' B</td>'
+    + '<td>' + prb(d[p + 'result'], ['Negative','Scanty','1+','2+','3+']) + '</td></tr>';
+}
+function cultRow(d, p){
+  var r = d[p + 'result'] || '';
+  var ntm = r === 'NTM' ? pbx(true) + ' ' + pval(d[p + 'species']) : (r === 'Contamination' ? 'Contamination' : '');
+  return '<tr><td class="c">' + pval(d[p + 'srno']) + '</td>'
+    + '<td class="c">' + pbx(r === 'Negative') + '</td>'
+    + '<td class="c">' + pbx(r === 'Positive') + '</td>'
+    + '<td>' + ntm + '</td></tr>';
+}
+function dateline(dt, dr, by, lab){
+  return '<div class="pline">Date tested: <b>' + pdate(dt) + '</b> &nbsp;&nbsp; Date Reported: <b>' + pdate(dr) + '</b>'
+    + ' &nbsp;&nbsp; Reported by: <b>' + pval(by) + '</b> <span class="rsig">(Name and Signature)</span>'
+    + '<br>Laboratory Name: <b>' + pval(lab) + '</b></div>';
+}
+function lpaRow(drug, val, interp, remark){
+  return '<tr><td>' + drug + '</td><td>' + prb(val, ['Yes','Inferred','No'])
+    + (remark ? '<br><i>Remark: ' + esc(remark) + '</i>' : '') + '</td><td><i>' + interp + '</i></td></tr>';
+}
+
 function renderPrint(d){
   d = d || {};
   var h = '<div class="pdoc">';
-  h += '<h1>NTEP REQUEST FORM FOR EXAMINATION OF BIOLOGICAL SPECIMEN FOR TB</h1>'
+
+  /* ===== PAGE 1 : REQUEST ===== */
+  h += '<div class="pg1">'
+    + '<h1>NTEP Request Form For examination of biological specimen</h1>'
     + '<div class="psub">(Required for Diagnosis of TB, Drug Sensitivity Testing and follow up)</div>'
-    + '<div class="psub"><b>ANNEXURE 15A</b></div>'
-    + '<div class="pmr">क्षयरोग तपासणी विनंती अर्ज</div>';
+    + '<div class="pannex">ANNEXURE 15A</div>'
 
-  /* 2. Patient */
-  h += '<div class="psec"><h2>2. Patient Information · रुग्णाची माहिती</h2>'
-    + prow('Patient name', d.patientName)
-    + '<div class="pgrid">' + prow('Age', d.age) + radioRow('Gender', d.gender, ['M','F','TG']) + '</div>'
-    + '<div class="pgrid">' + prow('Mobile no.', d.mobile) + prow('Specimen date of collection', fmtDate(d.specimenDate)) + '</div>'
-    + radioRow('Specimen type', d.specimenType, ['Sputum','Other']) + (d.specimenTypeOther ? prow('If Other, specify', d.specimenTypeOther) : '')
-    + '<div class="pgrid">' + prow('Aadhar no.', d.aadhar) + radioRow('HIV status', d.hivStatus, ['Reactive','Non-Reactive','Unknown']) + '</div>'
-    + prow('Address with landmark', d.address)
-    + checkRow('Key populations', [['kp_contact','Contact of known TB Patient'],['kp_diabetes','Diabetes'],['kp_tobacco','Tobacco'],['kp_prison','Prison'],['kp_miner','Miner'],['kp_migrant','Migrant'],['kp_refugee','Refugee'],['kp_slum','Urban slum'],['kp_hcw','Health-care worker'],['kp_other','Other']], d)
-    + (d.kp_other_text ? prow('Other (specify)', d.kp_other_text) : '')
-    + '</div>';
+  /* Patient Information */
+    + '<table class="ptab"><tr><th class="sech" colspan="3">Patient Information</th></tr>'
+    + '<tr><td style="width:38%">Patient name<br><b>' + pval(d.patientName) + '</b></td>'
+    + '<td style="width:27%">Age (in yrs): <b>' + pval(d.age) + '</b></td>'
+    + '<td>Gender: ' + prb(d.gender, ['M','F','TG']) + '</td></tr>'
+    + '<tr><td>Patient mobile no.<br>or other contact no.<br><b>' + pval(d.mobile) + '</b></td>'
+    + '<td>Specimen date of<br>collection (DD/MM/YY)<br><b>' + pdate(d.specimenDate) + '</b></td>'
+    + '<td>' + prb(d.specimenType, ['Sputum','Other']) + (d.specimenTypeOther ? '<br>Other (specify): <b>' + pval(d.specimenTypeOther) + '</b>' : '') + '</td></tr>'
+    + '<tr><td>Aadhar no. (If available)<br><b>' + pval(d.aadhar) + '</b></td>'
+    + '<td colspan="2">HIV Status: ' + prb(d.hivStatus, ['Reactive','Non-Reactive','Unknown']) + '</td></tr>'
+    + '<tr><td>Patient address with<br>landmark<br><b>' + pval(d.address) + '</b></td>'
+    + '<td colspan="2">Key populations: ' + pck([['kp_contact','Contact of known TB Patient'],['kp_diabetes','Diabetes'],['kp_tobacco','Tobacco'],['kp_prison','Prison'],['kp_miner','Miner'],['kp_migrant','Migrant'],['kp_refugee','Refugee'],['kp_slum','Urban slum'],['kp_hcw','Health-care worker'],['kp_other','Other']], d)
+    + (d.kp_other_text ? '<br>Other (specify): <b>' + pval(d.kp_other_text) + '</b>' : '') + '</td></tr></table>'
 
-  /* 3. Facility */
-  h += '<div class="psec"><h2>3. Referring Facility · संदर्भ देणारी सुविधा</h2>'
-    + prow('Name of referring facility', d.facilityName)
-    + prow('Type (PHI/DMC/TU/DTC/ICTC/ART/Medical College/DR-TB Centre/Private/Others)', d.facilityType)
-    + prow('Health Establishment ID (NIKSHAY)', d.healthEstId)
-    + '<div class="pgrid">' + prow('State', d.state) + prow('District', d.district) + '</div>'
-    + prow('Tuberculosis Unit (TU)', d.tu)
-    + '<div class="pgrid">' + prow('Episode ID', d.episodeId) + prow('Test request ID', d.testRequestId) + '</div></div>';
+  /* Referring facility */
+    + '<table class="ptab">'
+    + '<tr><td>Name and Type of referring facility (PHI/DMC/TU/DTC/ICTC/ART/Medical College/DR-TB Centre/Private Others, specify):<br><b>' + pval(d.facilityName) + '</b> &nbsp;&nbsp; Type: <b>' + pval(d.facilityType) + '</b></td></tr>'
+    + '<tr><td>Health Establishment ID (NIKSHAY): <b>' + pval(d.healthEstId) + '</b></td></tr>'
+    + '<tr><td>State: <b>' + pval(d.state) + '</b> &nbsp;&nbsp;&nbsp; District: <b>' + pval(d.district) + '</b> &nbsp;&nbsp;&nbsp; Tuberculosis Unit (TU): <b>' + pval(d.tu) + '</b></td></tr>'
+    + '<tr><td>Episode ID: <b>' + pval(d.episodeId) + '</b> &nbsp;&nbsp;&nbsp; Test request ID: <b>' + pval(d.testRequestId) + '</b></td></tr></table>'
 
-  /* 4. Reason */
-  h += '<div class="psec"><h2>4. Reason for Testing · तपासणीचे कारण</h2>'
-    + '<div class="prow"><span class="pl"><b>A. Diagnosis and follow up of TB</b></span><span class="pv"></span></div>'
-    + radioRow('H/O anti TB Rx >1 month', d.antiTBRx, ['Yes','No'])
-    + checkRow('Reason', [['tb_presumptive','Presumptive TB'],['tb_repeat','Repeat Exam'],['tb_private','Private referral'],['tb_ntm','Presumptive NTM']], d)
-    + '<div class="pgrid">' + prow('Predominant symptom', d.symptom) + prow('Duration (days)', d.symptomDays) + '</div>'
-    + checkRow('Follow-up', [['fu_endip','End IP'],['fu_endcp','End CP']], d)
-    + checkRow('Post treatment follow-up', [['pt_6m','6m'],['pt_12m','12m'],['pt_18m','18m'],['pt_24m','24m']], d)
-    + '<div class="prow"><span class="pl"><b>B. Drug-resistant TB</b></span><span class="pv"></span></div>'
-    + radioRow('Case type', d.caseType, ['New','Previously treated'])
-    + checkRow('Type of case', [['dr_h','H mono/poly TB'],['dr_mdrrr','MDR/RR'],['dr_xdr','XDR TB']], d)
-    + checkRow('Regimen type', [['reg_alloral_h','All oral H mono/poly TB'],['reg_shorter','Shorter MDR TB regimen'],['reg_longer','All oral longer regimen']], d)
-    + checkRow('Regimen composition', [['rg_Lfx','Lfx'],['rg_Mfxh','Mfx(h)'],['rg_Bdq','Bdq'],['rg_Lzd','Lzd'],['rg_Cfz','Cfz'],['rg_Cs','Cs'],['rg_Z','Z'],['rg_E','E'],['rg_Eto','Eto'],['rg_Dlm','Dlm'],['rg_Am','Am'],['rg_Km','Km'],['rg_Cm','Cm'],['rg_Other','Other']], d)
-    + (d.rg_Other_text ? prow('Other (specify)', d.rg_Other_text) : '')
-    + prow('Treatment follow-up (months)', d.treatFuMonths)
-    + '<div class="prow"><span class="pl"><b>C. Presumptive MDR TB</b></span><span class="pv">'
-    + [['mdr_atdiag','At diagnosis'],['mdr_contact','Contact of MDR/RR TB'],['mdr_smpos','Follow up Sm +ve'],['mdr_private','Private referral'],['mdr_discord','Discordance resolution']].map(function(k){ return '<span class="cb">' + cb(d[k[0]]) + ' ' + esc(k[1]) + '</span>&nbsp;&nbsp;'; }).join('') + '</span></div>'
-    + '<div class="prow"><span class="pl"><b>D. Presumptive H mono/poly</b></span><span class="pv"><span class="cb">' + cb(d.pres_h) + ' Presumptive H mono/poly</span></span></div>'
-    + '<div class="prow"><span class="pl"><b>E. Presumptive XDR TB</b></span><span class="pv">'
-    + [['xdr_atdiag','MDR/RR TB at Diagnosis'],['xdr_cultpos','Follow up Culture positive'],['xdr_fail','Failure or recurrent of MDR/RR-TB regimen'],['xdr_discord','Discordance resolution']].map(function(k){ return '<span class="cb">' + cb(d[k[0]]) + ' ' + esc(k[1]) + '</span>&nbsp;&nbsp;'; }).join('')
-    + (d.xdr_cultpos_months ? ' <i>(Follow-up culture positive — ' + esc(d.xdr_cultpos_months) + ' months)</i>' : '') + '</span></div>'
-    + '</div>';
+  /* Reason for Testing */
+    + '<div class="pline"><b>Reason for Testing:</b></div>'
+    + '<table class="ptab"><tr><th class="sech" colspan="3">Diagnosis and follow up of TB</th></tr>'
+    + '<tr><th class="c" colspan="2">Diagnosis of TB</th><th class="c">Follow up</th></tr>'
+    + '<tr><td colspan="2">H/O anti TB Rx for &gt;1 month: ' + prb(d.antiTBRx, ['Yes','No']) + '</td>'
+    + '<td>Reason: ' + pck([['fu_endip','End IP'],['fu_endcp','End CP']], d) + '</td></tr>'
+    + '<tr><td style="width:34%">' + pck([['tb_presumptive','Presumptive TB'],['tb_repeat','Repeat Exam'],['tb_private','Private referral'],['tb_ntm','Presumptive NTM']], d) + '</td>'
+    + '<td style="width:33%">Predominant symptom<br><b>' + pval(d.symptom) + '</b><br>Duration <b>' + pval(d.symptomDays) + '</b> days</td>'
+    + '<td>Post treatment: ' + pck([['pt_6m','6m'],['pt_12m','12m'],['pt_18m','18m'],['pt_24m','24m']], d) + '</td></tr></table>'
 
-  /* 5. Tests */
-  h += '<div class="psec"><h2>5. Test Requested · विनंती केलेली तपासणी</h2>'
-    + checkRow('Tests', [['t_micro','Microscopy'],['t_tst','TST'],['t_igra','IGRA'],['t_xray','Chest X-ray'],['t_cyto','Cytopathology'],['t_histo','Histopathology'],['t_cbnaat','CBNAAT'],['t_truenat','TrueNaat'],['t_culture','Culture'],['t_dst','DST'],['t_fllpa','FL-LPA'],['t_sllpa','SL-LPA'],['t_seq','Gene Sequencing'],['t_other','Other']], d)
-    + (d.t_other_text ? prow('Other (specify)', d.t_other_text) : '')
-    + prow('Requested by (designation)', d.requestedBy)
-    + '<div class="pgrid">' + prow('Contact number', d.reqContact) + prow('Email ID', d.reqEmail) + '</div></div>';
+  /* DR-TB */
+    + '<table class="ptab"><tr><th class="sech" colspan="2">Diagnosis and follow up Drug-resistant TB</th></tr>'
+    + '<tr><th class="c">Diagnosis of DR TB (DRT/DST)</th><th class="c">Follow up</th></tr>'
+    + '<tr><td style="width:50%">' + prb(d.caseType, ['New','Previously treated']) + '</td>'
+    + '<td>Type of case: ' + pck([['dr_h','H mono/poly TB'],['dr_mdrrr','MDR/RR'],['dr_xdr','XDR TB']], d) + '</td></tr>'
+    + '<tr><td>Presumptive MDR TB<br>' + pck([['mdr_atdiag','At diagnosis'],['mdr_contact','Contact of MDR/RR TB'],['mdr_smpos','Follow up Sm +ve'],['mdr_private','Private referral'],['mdr_discord','Discordance resolution']], d) + '</td>'
+    + '<td>Regiment Type:<br>' + pck([['reg_alloral_h','All oral H mono/poly TB'],['reg_shorter','Shorter MDR TB regimen'],['reg_longer','All oral longer regimen']], d) + '</td></tr>'
+    + '<tr><td>' + pbx(d.pres_h) + ' Presumptive H mono/poly</td>'
+    + '<td>Regimen composition for all oral longer regimen:<br>' + pck([['rg_Lfx','Lfx'],['rg_Mfxh','Mfx(h)'],['rg_Bdq','Bdq'],['rg_Lzd','Lzd'],['rg_Cfz','Cfz'],['rg_Cs','Cs'],['rg_Z','Z'],['rg_E','E'],['rg_Eto','Eto'],['rg_Dlm','Dlm'],['rg_Am','Am'],['rg_Km','Km'],['rg_Cm','Cm'],['rg_Other','Other']], d) + (d.rg_Other_text ? ' (' + pval(d.rg_Other_text) + ')' : '') + '</td></tr>'
+    + '<tr><td>Presumptive XDR TB<br>' + pck([['xdr_atdiag','MDR/RR TB at Diagnosis'],['xdr_cultpos','Follow up Culture positive'],['xdr_fail','Failure or recument of MDR/RR-TB regimen'],['xdr_discord','Discordance resolution']], d) + (d.xdr_cultpos_months ? ' (' + pval(d.xdr_cultpos_months) + ' Months)' : '') + '</td>'
+    + '<td>Treatment follow up months: <b>' + pval(d.treatFuMonths) + '</b></td></tr></table>'
 
-  /* 6. Lab */
-  h += '<div class="psec"><h2>6. Results — प्रयोगशाळा विभाग (For laboratory use)</h2>'
-    + prow('NIKSHAY ID Generated', d.nikshayId)
-    + '<div class="prow"><span class="pl"><b>Microscopy</b></span><span class="pv"></span></div>'
-    + radioRow('Method', d.microMethod, ['ZN','Fluorescent'])
-    + '<div class="prow"><span class="pl"><b>Sample A</b></span><span class="pv"></span></div>'
-    + '<div class="pgrid">' + prow('Lab sr. no.', d.microA_srno)
-    + '<div class="prow"><span class="pl">Visual appearance</span><span class="pv"><span class="cb">' + cb(d.microA_S) + ' S</span>&nbsp;<span class="cb">' + cb(d.microA_M) + ' M</span>&nbsp;<span class="cb">' + cb(d.microA_B) + ' B</span></span></div></div>'
-    + radioRow('Result', d.microA_result, ['Negative','Scanty','1+','2+','3+'])
-    + '<div class="prow"><span class="pl"><b>Sample B</b></span><span class="pv"></span></div>'
-    + '<div class="pgrid">' + prow('Lab sr. no.', d.microB_srno)
-    + '<div class="prow"><span class="pl">Visual appearance</span><span class="pv"><span class="cb">' + cb(d.microB_S) + ' S</span>&nbsp;<span class="cb">' + cb(d.microB_M) + ' M</span>&nbsp;<span class="cb">' + cb(d.microB_B) + ' B</span></span></div></div>'
-    + radioRow('Result', d.microB_result, ['Negative','Scanty','1+','2+','3+'])
-    + '<div class="pgrid">' + prow('Date tested', fmtDate(d.microDateTested)) + prow('Date reported', fmtDate(d.microDateReported)) + '</div>'
-    + '<div class="pgrid">' + prow('Reported by', d.microReportedBy) + prow('Laboratory name', d.microLab) + '</div>'
-    + '<div class="prow"><span class="pl"><b>NAAT</b></span><span class="pv"></span></div>'
-    + prow('Lab serial', d.naatSrno)
-    + '<div class="pgrid">' + radioRow('Type', d.naatType, ['CBNAAT','TrueNat']) + radioRow('Sample', d.naatSample, ['A','B']) + '</div>'
-    + radioRow('M. Tuberculosis', d.naatMtb, ['Detected','Not Detected','N/A'])
-    + radioRow('Rif Resistance', d.naatRif, ['Detected','Not Detected','Indeterminate','N/A'])
-    + radioRow('Test outcome', d.naatOutcome, ['No Result','Invalid','Error'])
-    + (d.naatErrorCode ? prow('Error code', d.naatErrorCode) : '')
-    + '<div class="prow"><span class="pl"><b>Culture</b></span><span class="pv"></span></div>'
-    + radioRow('Method', d.cultureMethod, ['LJ','LC'])
-    + '<div class="prow"><span class="pl"><b>Row 1</b></span><span class="pv"></span></div>'
-    + prow('Lab sr. no.', d.cult1_srno) + radioRow('Result', d.cult1_result, ['Negative','Positive','NTM','Contamination'])
-    + (d.cult1_species ? prow('NTM species', d.cult1_species) : '')
-    + '<div class="prow"><span class="pl"><b>Row 2</b></span><span class="pv"></span></div>'
-    + prow('Lab sr. no.', d.cult2_srno) + radioRow('Result', d.cult2_result, ['Negative','Positive','NTM','Contamination'])
-    + (d.cult2_species ? prow('NTM species', d.cult2_species) : '')
-    + '<div class="pgrid">' + prow('Date result', fmtDate(d.cultDateResult)) + prow('Date reported', fmtDate(d.cultDateReported)) + '</div>'
-    + '<div class="pgrid">' + prow('Reported by', d.cultReportedBy) + prow('Laboratory name', d.cultLab) + '</div>'
-    + '<div class="prow"><span class="pl"><b>First line LPA</b></span><span class="pv"></span></div>'
-    + prow('Lab serial', d.flpaSrno) + radioRow('Type', d.flpaType, ['Direct','Indirect'])
-    + radioRow('Rifampicin (R) — resistant', d.flpa_R, ['Yes','Inferred','No']) + (d.flpa_R_remark ? prow('Remark', d.flpa_R_remark) : '')
-    + radioRow('Isoniazid (KatG) — resistant', d.flpa_KatG, ['Yes','Inferred','No']) + (d.flpa_KatG_remark ? prow('Remark', d.flpa_KatG_remark) : '')
-    + radioRow('Isoniazid (InhA) — resistant', d.flpa_InhA, ['Yes','Inferred','No']) + (d.flpa_InhA_remark ? prow('Remark', d.flpa_InhA_remark) : '')
-    + '<div class="prow"><span class="pl"><b>Second line LPA</b></span><span class="pv"></span></div>'
-    + prow('Lab serial', d.slpaSrno) + radioRow('Type', d.slpaType, ['Direct','Indirect']);
-  [['slpa_Lfx','Levofloxacin'],['slpa_Mfx','Moxifloxacin'],['slpa_Am','Amikacin'],['slpa_Km','Kanamycin'],['slpa_Cm','Capreomycin']].forEach(function(x){
-    h += radioRow(x[1] + ' — resistant', d[x[0]], ['Yes','Inferred','No']) + (d[x[0] + '_remark'] ? prow('Remark', d[x[0] + '_remark']) : '');
-  });
-  h += '<div class="prow"><span class="pl"><b>DST</b></span><span class="pv"></span></div>'
-    + prow('Lab sr. no.', d.dstSrno)
-    + '<div class="prow"><span class="pl">Drug susceptibility<br><small>(S: Susceptible, R: Resistant, C: Contaminated, —: Not done)</small></span><span class="pv">'
-    + DST_DRUGS.map(function(x){ return '<span class="cb">' + esc(x[1]) + ': <b>' + esc(d[x[0]] || '—') + '</b></span>&nbsp;&nbsp;'; }).join('')
-    + '</span></div>'
-    + '<div class="prow"><span class="pl"><b>Other tests</b></span><span class="pv"></span></div>'
-    + prow('Test name', d.otherTestName) + prow('Result', d.otherTestResult)
-    + prow('Date reported', fmtDate(d.otherTestDateReported))
-    + '<div class="pgrid">' + prow('Reported by', d.otherTestReportedBy) + prow('Laboratory name', d.otherTestLab) + '</div>'
-    + '</div>';
+  /* Test requested */
+    + '<table class="ptab"><tr><td>Test requested:<br>'
+    + pck([['t_micro','Microscopy'],['t_tst','TST'],['t_igra','IGRA'],['t_xray','Chest X-ray'],['t_cyto','Cytopathology'],['t_histo','Histopathology'],['t_cbnaat','CBNAAT'],['t_truenat','TrueNaat'],['t_culture','Culture'],['t_dst','DST'],['t_fllpa','FL - LPA'],['t_sllpa','SL - LPA'],['t_seq','Gene Sequencing'],['t_other','Other']], d)
+    + (d.t_other_text ? ' (Please Specify): <b>' + pval(d.t_other_text) + '</b>' : '')
+    + '<br>Requested by (Designation and Signature): <b>' + pval(d.requestedBy) + '</b>'
+    + '<br>Contact Number: <b>' + pval(d.reqContact) + '</b> &nbsp;&nbsp;&nbsp; Email ID: <b>' + pval(d.reqEmail) + '</b></td></tr></table>'
+    + '</div>'; /* /pg1 */
 
-  h += '<div class="pfoot"><div class="sig">Signature of requesting MO/Staff<br>विनंती करणाऱ्याची सही</div>'
-    + '<div class="sig">Date / दिनांक: ___________</div>'
-    + '<div class="sig">Laboratory seal & signature<br>प्रयोगशाळा शिक्का व सही</div></div>';
+  /* ===== PAGE 2 : RESULTS ===== */
+  h += '<div class="pg2">'
+    + '<div class="pline"><b>Results:</b> &nbsp;&nbsp;&nbsp; NIKSHAY ID Generated: <b>' + pval(d.nikshayId) + '</b></div>'
+
+  /* Microscopy */
+    + '<table class="ptab"><tr><th class="sech" colspan="4">Microscopy (' + prb(d.microMethod, ['ZN','Fluorescent']) + ')</th></tr>'
+    + '<tr><th></th><th class="c">Lab Sr. No</th><th class="c">Visual appearance</th><th class="c">Result</th></tr>'
+    + microRow('Sample A', d, 'microA_') + microRow('Sample B', d, 'microB_') + '</table>'
+    + dateline(d.microDateTested, d.microDateReported, d.microReportedBy, d.microLab)
+
+  /* NAAT */
+    + '<table class="ptab"><tr><th class="sech" colspan="2">Nucleic Acide Amplification Test (NAAT)</th><td><b>Lab Serial:</b> ' + pval(d.naatSrno) + '</td></tr>'
+    + '<tr><td style="width:30%">Type of test</td><td colspan="2">' + prb(d.naatType, ['CBNAAT','TrueNat']) + '</td></tr>'
+    + '<tr><td>Sample</td><td colspan="2">' + prb(d.naatSample, ['A','B']) + '</td></tr>'
+    + '<tr><td>M. Tuberculosis</td><td colspan="2">' + prb(d.naatMtb, ['Detected','Not Detected','N/A']) + '</td></tr>'
+    + '<tr><td>Rif Resistance</td><td colspan="2">' + prb(d.naatRif, ['Detected','Not Detected','Indeterminate','N/A']) + '</td></tr>'
+    + '<tr><td>Test</td><td colspan="2">' + prb(d.naatOutcome, ['No Result','Invalid','Error']) + (d.naatErrorCode ? ' &nbsp; Error Code: <b>' + pval(d.naatErrorCode) + '</b>' : '') + ' (Please arrange for fresh sample)</td></tr></table>'
+    + dateline(null, null, null, null)
+
+  /* Culture */
+    + '<table class="ptab"><tr><th class="sech" colspan="4">Culture (' + prb(d.cultureMethod, ['LJ','LC']) + ')</th></tr>'
+    + '<tr><th class="c">Lab Sr. No</th><th class="c">Negative</th><th class="c">Positive</th><th class="c">NTM (write species)</th></tr>'
+    + cultRow(d, 'cult1_') + cultRow(d, 'cult2_') + '</table>'
+    + dateline(d.cultDateResult, d.cultDateReported, d.cultReportedBy, d.cultLab)
+
+  /* First line LPA */
+    + '<table class="ptab"><tr><th class="sech" colspan="3">First line LPA</th></tr>'
+    + '<tr><td colspan="3">Lab serial: <b>' + pval(d.flpaSrno) + '</b> &nbsp;&nbsp;&nbsp; ' + prb(d.flpaType, ['Direct','Indirect']) + '</td></tr>'
+    + '<tr><th>Drug</th><th>Resistant Detected</th><th>Final interpretation</th></tr>'
+    + lpaRow('Rifampicin (R)', d.flpa_R, 'If yes or inferred, R should not be given', d.flpa_R_remark)
+    + lpaRow('Isoniazid (Kat G)', d.flpa_KatG, 'If yes or inferred, H(h) should not be given', d.flpa_KatG_remark)
+    + lpaRow('Isoniazid (Inh A)', d.flpa_InhA, 'If yes or inferred, H (h) can be considered to be given', d.flpa_InhA_remark)
+    + '</table>'
+    + dateline(null, null, null, null)
+
+  /* Second line LPA */
+    + '<table class="ptab"><tr><th class="sech" colspan="3">Second line LPA</th></tr>'
+    + '<tr><td colspan="3">Lab serial: <b>' + pval(d.slpaSrno) + '</b> &nbsp;&nbsp;&nbsp; ' + prb(d.slpaType, ['Direct','Indirect']) + '</td></tr>'
+    + '<tr><th>Drug</th><th>Resistant Detected</th><th>Final interpretation</th></tr>'
+    + lpaRow('Levofloxacin', d.slpa_Lfx, 'If yes or inferred, Lfx should not be given, Mfx (h) can be considered.', d.slpa_Lfx_remark)
+    + lpaRow('Moxifloxacin', d.slpa_Mfx, 'If yes or inferred, Lfx &amp; Mfx (h) should not be given', d.slpa_Mfx_remark)
+    + lpaRow('Amikacin', d.slpa_Am, 'If yes or inferred, Am should not be given', d.slpa_Am_remark)
+    + lpaRow('Kanamycin', d.slpa_Km, 'If yes or inferred, Km should not be given', d.slpa_Km_remark)
+    + lpaRow('Capreomycin', d.slpa_Cm, 'If yes or inferred, Cm should not be given', d.slpa_Cm_remark)
+    + '</table>'
+    + dateline(null, null, null, null)
+
+  /* DST */
+    + '<table class="ptab"><tr><th class="sech" colspan="16">Drug Susceptibility Test (DST) results</th></tr>'
+    + '<tr><th class="c" rowspan="2">Lab Sr.No</th><th class="c" colspan="6">1st line drugs</th><th class="c" colspan="3">SLI</th><th class="c" colspan="6">FQ</th></tr>'
+    + '<tr><th class="c">R</th><th class="c">H<br>(inhA)</th><th class="c">H<br>(katG)</th><th class="c">Z</th><th class="c">E</th><th class="c">S</th>'
+    + '<th class="c">Km</th><th class="c">Cm</th><th class="c">Am</th>'
+    + '<th class="c">Lfx</th><th class="c">Mfx<br>(0.5)</th><th class="c">Mfx<br>(1)</th><th class="c">Mfx<br>(2)</th><th class="c">PAS</th><th class="c">Lzd</th></tr>'
+    + '<tr><td class="c">' + pval(d.dstSrno) + '</td>'
+    + ['dst_R','dst_HinhA','dst_HkatG','dst_Z','dst_E','dst_S','dst_Km','dst_Cm','dst_Am','dst_Lfx','dst_Mfx05','dst_Mfx1','dst_Mfx2','dst_PAS','dst_Lzd'].map(function(k){ return '<td class="c"><b>' + pval(d[k] || '--') + '</b></td>'; }).join('')
+    + '</tr></table>'
+    + '<div class="pline">R: Resistant; S: Susceptible; C: Contaminated; --: Not done'
+    + ' &nbsp;&nbsp; Other drugs &mdash; Cfz: <b>' + pval(d.dst_Cfz || '--') + '</b> &nbsp;Cs: <b>' + pval(d.dst_Cs || '--') + '</b> &nbsp;Azi: <b>' + pval(d.dst_Azi || '--') + '</b> &nbsp;Bdq: <b>' + pval(d.dst_Bdq || '--') + '</b> &nbsp;DLM: <b>' + pval(d.dst_DLM || '--') + '</b> &nbsp;Eto: <b>' + pval(d.dst_Eto || '--') + '</b></div>'
+    + dateline(null, null, null, null)
+
+  /* Other tests */
+    + '<table class="ptab"><tr><th class="sech">Other tests for TB diagnosis</th></tr>'
+    + '<tr><td>Test (Please Specify): <b>' + pval(d.otherTestName) + '</b></td></tr>'
+    + '<tr><td>Result: <b>' + pval(d.otherTestResult) + '</b></td></tr>'
+    + '<tr><td>Date reported: <b>' + pdate(d.otherTestDateReported) + '</b> &nbsp;&nbsp;&nbsp; Reported by: <b>' + pval(d.otherTestReportedBy) + '</b></td></tr>'
+    + '<tr><td>By: <b>' + pval(d.otherTestBy) + '</b></td></tr>'
+    + '<tr><td>Laboratory Name: <b>' + pval(d.otherTestLab) + '</b> <span class="rsig">(Name and Signature)</span></td></tr></table>'
+
+    + '<div class="pfoot"><div class="sig">Signature of requesting MO / Staff</div>'
+    + '<div class="sig">Date: ___________</div>'
+    + '<div class="sig">Laboratory seal &amp; signature</div></div>'
+    + '</div>'; /* /pg2 */
+
   h += '</div>';
   return h;
 }
+
 
 /* ================= EXPORT ================= */
 function printRecord(data, name){
@@ -857,12 +910,7 @@ function exportRecord(id){
   printRecord(rec.data);
 }
 function standaloneHTML(data, name){
-  var css = 'body{font-family:Arial,sans-serif;padding:18px;color:#000}.pdoc{font-size:11px;line-height:1.45}'
-    + 'h1{font-size:16px;text-align:center}.psub,.pmr{text-align:center;margin-bottom:4px}.pmr{font-weight:bold}'
-    + '.psec{border:1.5px solid #000;margin-bottom:8px}.psec>h2{font-size:12px;background:#e8e8e8;padding:4px 8px;border-bottom:1px solid #000;margin:0}'
-    + '.prow{display:flex;border-bottom:1px solid #bbb;padding:3px 8px;gap:8px}.pl{font-weight:bold;min-width:190px;flex:none}.pv{flex:1}'
-    + '.pgrid .prow{width:50%;box-sizing:border-box}.pgrid{display:flex;flex-wrap:wrap}.pfoot{display:flex;justify-content:space-between;margin-top:14px}'
-    + '.sig{border-top:1px solid #000;padding-top:4px;width:30%;text-align:center}';
+  var css = '@page{size:A4;margin:6mm}body{font-family:Arial,sans-serif;color:#000;background:#fff}.pdoc{font-family:Arial,sans-serif;font-size:8pt;line-height:1.25;color:#000}.pdoc h1{font-size:12pt;text-align:center;margin:0}.psub{text-align:center;font-size:8.5pt}.pannex{text-align:center;font-size:9pt;font-weight:bold;margin:2px 0 4px}.pg2{page-break-before:always}.ptab{width:100%;border-collapse:collapse;margin-bottom:3px;page-break-inside:avoid}.ptab td,.ptab th{border:1px solid #000;padding:1.5px 3px;vertical-align:top;font-size:8pt}.ptab th.sech{background:#e8e8e8;text-align:center;font-size:8.5pt;padding:2px 4px}.ptab th.c,.ptab td.c{text-align:center}.bx{display:inline-block;min-width:8px;height:8px;border:1.1px solid #000;font-size:7px;line-height:8px;text-align:center;vertical-align:-1px;margin-right:2px;font-weight:bold}.pline{margin:2px 0 3px;font-size:8pt}.rsig{float:right}.pfoot{display:flex;justify-content:space-between;margin-top:6px;font-size:8pt;page-break-inside:avoid}.pfoot .sig{border-top:1px solid #000;padding-top:3px;width:31%;text-align:center}';
   return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>NTEP Form — ' + esc(name || 'record') + '</title>'
     + '<style>' + css + '</style></head><body>' + renderPrint(data) + '</body></html>';
 }
