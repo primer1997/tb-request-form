@@ -489,7 +489,7 @@ function persist(){ try{ localStorage.setItem(lsKey(), JSON.stringify(records));
 /* ================= FACILITY AUTH + CLOUD SYNC ================= */
 var SUPA_URL = 'https://toymclpcyqyefjgycqgd.supabase.co';
 var SUPA_KEY = 'sb_publishable_jhspAUNypPeHQBJPMLateA_LV6Pek6S';
-var supa = null, currentUid = null, facility = {name:'', type:''};
+var supa = null, currentUid = null, currentEmail = '', facility = {name:'', type:''};
 
 function authErr(m){ var e = $('authErr'); if(e) e.textContent = m || ''; }
 function showAuth(){
@@ -506,8 +506,8 @@ function showApp(){
   window.scrollTo(0, 0);
 }
 function setFacChip(){
-  $('facName').textContent = facility.name || '';
-  $('facRow').style.display = facility.name ? 'flex' : 'none';
+  $('facName').textContent = facility.name || currentEmail || '';
+  $('facRow').style.display = currentUid ? 'flex' : 'none';
 }
 function cloudUpsert(rec){
   if(!supa || !currentUid) return;
@@ -548,6 +548,10 @@ function cloudSyncAll(){
 function afterLogin(user){
   currentUid = user.id;
   var meta = user.user_metadata || {};
+  currentEmail = user.email || '';
+  /* show chip + logout immediately from signup metadata; refine when profile arrives */
+  facility = {name: meta.facility_name || '', type: meta.facility_type || ''};
+  setFacChip();
   /* one-time migration of pre-login local forms into this facility's store */
   try{
     var ukey = LS_KEY + '_' + currentUid;
@@ -559,10 +563,11 @@ function afterLogin(user){
   loadStore();
   supa.from('tb_facilities').select('facility_name,facility_type').eq('user_id', currentUid).maybeSingle()
     .then(function(res){
-      if(res && res.data) facility = {name: res.data.facility_name || '', type: res.data.facility_type || ''};
-      else facility = {name: meta.facility_name || '', type: meta.facility_type || ''};
-      setFacChip();
-    });
+      if(res && res.data && (res.data.facility_name || res.data.facility_type)){
+        facility = {name: res.data.facility_name || '', type: res.data.facility_type || ''};
+        setFacChip();
+      }
+    }, function(){ /* network failed: keep metadata fallback, logout stays visible */ });
   cloudSyncAll();
   showApp();
   renderList(''); updateStats();
