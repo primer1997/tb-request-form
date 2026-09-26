@@ -9,6 +9,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 /* ============ NTEP SMART FORM — fresh build v1 ============ */
 *{box-sizing:border-box;margin:0;padding:0}
@@ -164,6 +165,28 @@ details.acc .acc-body{padding:4px 15px 16px;animation:fadeUp .3s both}
 .mbtn.no{background:var(--chip)}
 .mbtn.yes{background:var(--red);color:#fff}
 
+/* ---------- AUTH ---------- */
+#authScreen{display:none;min-height:100vh;background:linear-gradient(160deg,var(--navy),var(--navy2) 55%,#0b3b4a);padding:30px 18px 40px;color:#fff}
+.auth-wrap{max-width:400px;margin:0 auto;animation:fadeUp .45s both}
+.auth-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:26px 22px;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.auth-card .logo{margin:0 auto 10px}
+.auth-card h2{font-size:21px;letter-spacing:.2px}
+.auth-sub{color:#a9c3d6;font-size:13px;margin:5px 0 16px}
+.atabs{display:flex;background:rgba(255,255,255,.09);border-radius:14px;padding:4px;margin-bottom:16px}
+.atab{flex:1;border:0;background:transparent;color:#c8dcea;padding:11px;border-radius:10px;font-weight:700;font-size:14px}
+.atab.on{background:linear-gradient(135deg,var(--gold),var(--gold-d));color:#3a2a08}
+.afield{text-align:left;margin-bottom:12px}
+.afield label{display:block;font-size:12.5px;color:#a9c3d6;margin-bottom:5px;font-weight:600}
+.afield input,.afield select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-family:inherit}
+.afield select option{color:#111}
+.abtn{width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--gold),var(--gold-d));font-weight:800;font-size:16px;color:#3a2a08;margin-top:6px;box-shadow:0 8px 22px rgba(224,170,78,.35)}
+.abtn:disabled{opacity:.55}
+#authErr{color:#ffb4a2;font-size:13px;min-height:20px;margin:10px 0 0;line-height:1.5}
+.auth-note{font-size:12px;color:#8fa9bd;margin-top:14px;line-height:1.6}
+.fac-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.fac-chip{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);padding:7px 13px;border-radius:999px;font-size:13px;color:#fff;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logoutbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:700}
+
 /* ---------- PRINT : official Annexure 15A, 2 pages ---------- */
 #printView{display:none}
 @page{size:A4;margin:6mm}
@@ -193,6 +216,37 @@ details.acc .acc-body{padding:4px 15px 16px;animation:fadeUp .3s both}
 </style>
 </head>
 <body>
+
+<!-- ============ FACILITY AUTH ============ -->
+<div id="authScreen">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="logo"><svg width="38" height="38" viewBox="0 0 64 64" aria-label="TB logo"><rect x="29" y="4" width="6" height="13" rx="3" fill="#ffffff"/><path d="M32 17 L24 26 M32 17 L40 26" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M28 22 C20 23 14 30 13 40 C12 50 17 57 24 57.5 C27 57.7 29 56 29 52 L29 28 C29 24.5 28.7 22.8 28 22 Z" fill="#ffffff"/><path d="M36 22 C44 23 50 30 51 40 C52 50 47 57 40 57.5 C37 57.7 35 56 35 52 L35 28 C35 24.5 35.3 22.8 36 22 Z" fill="#ffffff"/><g fill="#d63031"><rect x="18.5" y="33" width="8" height="3.2" rx="1.6" transform="rotate(-18 22.5 34.6)"/><rect x="37.5" y="29" width="8" height="3.2" rx="1.6" transform="rotate(14 41.5 30.6)"/><rect x="28" y="43.5" width="8" height="3.2" rx="1.6" transform="rotate(-8 32 45.1)"/><rect x="23.5" y="40.5" width="5.2" height="2.8" rx="1.4" transform="rotate(22 26.1 41.9)"/></g></svg></div>
+      <h2>TB Request Form</h2>
+      <div class="auth-sub">Facility Login · सुविधा लॉगिन</div>
+      <div class="atabs">
+        <button class="atab on" id="tabLogin" type="button">Login · लॉगिन</button>
+        <button class="atab" id="tabReg" type="button">Register · नोंदणी</button>
+      </div>
+      <div id="paneLogin">
+        <div class="afield"><label>Email · ईमेल</label><input id="liEmail" type="email" autocomplete="username" placeholder="facility@example.com"></div>
+        <div class="afield"><label>Password · पासवर्ड</label><input id="liPass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+        <button class="abtn" id="loginBtn" type="button">Login · लॉगिन करा</button>
+      </div>
+      <div id="paneReg" style="display:none">
+        <div class="afield"><label>Facility name · सुविधेचे नाव *</label><input id="rgName" placeholder="e.g. PHC Dehare"></div>
+        <div class="afield"><label>Facility type · सुविधेचा प्रकार</label><select id="rgType"><option value="">— Select —</option><option>PHI</option><option>DMC</option><option>TU</option><option>DTC</option><option>ICTC</option><option>ART</option><option>Medical College</option><option>DR-TB Centre</option><option>Private</option><option>Others</option></select></div>
+        <div class="afield"><label>Email · ईमेल *</label><input id="rgEmail" type="email" autocomplete="username" placeholder="facility@example.com"></div>
+        <div class="afield"><label>Password · पासवर्ड (min 6 characters) *</label><input id="rgPass" type="password" autocomplete="new-password" placeholder="••••••••"></div>
+        <div class="afield"><label>Confirm password · पासवर्ड पुन्हा *</label><input id="rgPass2" type="password" autocomplete="new-password" placeholder="••••••••"></div>
+        <button class="abtn" id="regBtn" type="button">Register Facility · नोंदणी करा</button>
+      </div>
+      <p id="authErr"></p>
+      <div class="auth-note">Each facility gets its own private forms.<br>प्रत्येक सुविधेचे अर्ज वेगळे आणि सुरक्षित राहतील.</div>
+    </div>
+  </div>
+</div>
+
 <div class="shell" id="app">
 
   <!-- ============ HOME ============ -->
@@ -203,6 +257,10 @@ details.acc .acc-body{padding:4px 15px 16px;animation:fadeUp .3s both}
         <div class="brand-row">
           <div class="logo"><svg width="38" height="38" viewBox="0 0 64 64" aria-label="TB logo"><rect x="29" y="4" width="6" height="13" rx="3" fill="#ffffff"/><path d="M32 17 L24 26 M32 17 L40 26" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M28 22 C20 23 14 30 13 40 C12 50 17 57 24 57.5 C27 57.7 29 56 29 52 L29 28 C29 24.5 28.7 22.8 28 22 Z" fill="#ffffff"/><path d="M36 22 C44 23 50 30 51 40 C52 50 47 57 40 57.5 C37 57.7 35 56 35 52 L35 28 C35 24.5 35.3 22.8 36 22 Z" fill="#ffffff"/><g fill="#d63031"><rect x="18.5" y="33" width="8" height="3.2" rx="1.6" transform="rotate(-18 22.5 34.6)"/><rect x="37.5" y="29" width="8" height="3.2" rx="1.6" transform="rotate(14 41.5 30.6)"/><rect x="28" y="43.5" width="8" height="3.2" rx="1.6" transform="rotate(-8 32 45.1)"/><rect x="23.5" y="40.5" width="5.2" height="2.8" rx="1.4" transform="rotate(22 26.1 41.9)"/></g></svg></div>
           <h1>TB Request Form<span class="mr">क्षयरोग नमुना तपासणी स्मार्ट अर्ज</span></h1>
+        </div>
+        <div class="fac-row" id="facRow" style="display:none">
+          <span class="fac-chip">🏥 <b id="facName"></b></span>
+          <button class="logoutbtn" id="logoutBtn" type="button">⏻ Logout</button>
         </div>
         <div class="hero-stats">
           <div class="hstat"><b id="statTotal">0</b><span>Saved forms<br>जतन केलेले अर्ज</span></div>
@@ -421,11 +479,143 @@ function toast(msg){
   var t = $('toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(t._h); t._h = setTimeout(function(){ t.classList.remove('show'); }, 2600);
 }
+function lsKey(){ return currentUid ? LS_KEY + '_' + currentUid : LS_KEY; }
 function loadStore(){
-  try{ var r = JSON.parse(localStorage.getItem(LS_KEY)); records = Array.isArray(r) ? r : []; }
+  try{ var r = JSON.parse(localStorage.getItem(lsKey())); records = Array.isArray(r) ? r : []; }
   catch(e){ records = []; }
 }
-function persist(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(records)); }catch(e){} }
+function persist(){ try{ localStorage.setItem(lsKey(), JSON.stringify(records)); }catch(e){} }
+
+/* ================= FACILITY AUTH + CLOUD SYNC ================= */
+var SUPA_URL = 'https://toymclpcyqyefjgycqgd.supabase.co';
+var SUPA_KEY = 'sb_publishable_jhspAUNypPeHQBJPMLateA_LV6Pek6S';
+var supa = null, currentUid = null, facility = {name:'', type:''};
+
+function authErr(m){ var e = $('authErr'); if(e) e.textContent = m || ''; }
+function showAuth(){
+  $('app').style.display = 'none';
+  $('authScreen').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+function showApp(){
+  $('authScreen').style.display = 'none';
+  $('app').style.display = 'block';
+  $('homeScreen').style.display = 'block';
+  $('wizScreen').style.display = 'none';
+  $('wizActions').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+function setFacChip(){
+  $('facName').textContent = facility.name || '';
+  $('facRow').style.display = facility.name ? 'flex' : 'none';
+}
+function cloudUpsert(rec){
+  if(!supa || !currentUid) return;
+  supa.from('tb_request_forms').upsert({id: rec.id, user_id: currentUid, data: rec.data, created_at: rec.createdAt, updated_at: rec.updatedAt})
+    .then(function(res){ if(res.error) toast('☁️ Cloud sync failed · क्लाउड सिंक अयशस्वी'); });
+}
+function cloudDelete(id){
+  if(!supa || !currentUid) return;
+  supa.from('tb_request_forms').delete().eq('id', id).eq('user_id', currentUid)
+    .then(function(res){ if(res.error) toast('☁️ Cloud delete failed'); });
+}
+function cloudSyncAll(){
+  if(!supa || !currentUid) return;
+  supa.from('tb_request_forms').select('id,data,created_at,updated_at').eq('user_id', currentUid)
+    .then(function(res){
+      if(res.error) return; /* stay on local cache */
+      var byId = {}, push = [];
+      records.forEach(function(r){ byId[r.id] = r; });
+      (res.data || []).forEach(function(row){
+        var local = byId[row.id];
+        if(!local){
+          records.push({id: row.id, data: row.data || {}, createdAt: row.created_at, updatedAt: row.updated_at});
+        } else if((row.updated_at || '') > (local.updatedAt || '')){
+          local.data = row.data || {}; local.updatedAt = row.updated_at;
+        }
+        delete byId[row.id];
+      });
+      Object.keys(byId).forEach(function(id){ push.push(byId[id]); });
+      persist();
+      if(push.length){
+        supa.from('tb_request_forms').upsert(push.map(function(r){
+          return {id: r.id, user_id: currentUid, data: r.data, created_at: r.createdAt, updated_at: r.updatedAt};
+        })).then(function(u){ if(u.error) toast('☁️ Cloud sync failed'); });
+      }
+      renderList($('searchBox').value || ''); updateStats();
+    });
+}
+function afterLogin(user){
+  currentUid = user.id;
+  var meta = user.user_metadata || {};
+  /* one-time migration of pre-login local forms into this facility's store */
+  try{
+    var ukey = LS_KEY + '_' + currentUid;
+    var base = JSON.parse(localStorage.getItem(LS_KEY));
+    if(Array.isArray(base) && base.length && !localStorage.getItem(ukey)){
+      localStorage.setItem(ukey, JSON.stringify(base));
+    }
+  }catch(e){}
+  loadStore();
+  supa.from('tb_facilities').select('facility_name,facility_type').eq('user_id', currentUid).maybeSingle()
+    .then(function(res){
+      if(res && res.data) facility = {name: res.data.facility_name || '', type: res.data.facility_type || ''};
+      else facility = {name: meta.facility_name || '', type: meta.facility_type || ''};
+      setFacChip();
+    });
+  cloudSyncAll();
+  showApp();
+  renderList(''); updateStats();
+}
+function doLogin(){
+  if(!supa){ authErr('⚠️ No internet · इंटरनेट नाही'); return; }
+  var em = $('liEmail').value.trim(), pw = $('liPass').value;
+  if(!em || !pw){ authErr('⚠️ Enter email and password · ईमेल आणि पासवर्ड टाका'); return; }
+  authErr(''); $('loginBtn').disabled = true;
+  supa.auth.signInWithPassword({email: em, password: pw}).then(function(res){
+    $('loginBtn').disabled = false;
+    if(res.error){ authErr('⚠️ ' + res.error.message); return; }
+    if(res.data.session) afterLogin(res.data.session.user);
+  });
+}
+function doRegister(){
+  if(!supa){ authErr('⚠️ No internet · इंटरनेट नाही'); return; }
+  var nm = $('rgName').value.trim(), tp = $('rgType').value,
+      em = $('rgEmail').value.trim(), pw = $('rgPass').value, pw2 = $('rgPass2').value;
+  if(!nm){ authErr('⚠️ Facility name required · सुविधेचे नाव आवश्यक'); return; }
+  if(!em || em.indexOf('@') < 0){ authErr('⚠️ Valid email required · योग्य ईमेल टाका'); return; }
+  if(!pw || pw.length < 6){ authErr('⚠️ Password min 6 characters · पासवर्ड किमान 6 अक्षरी'); return; }
+  if(pw !== pw2){ authErr('⚠️ Passwords do not match · पासवर्ड जुळत नाही'); return; }
+  authErr(''); $('regBtn').disabled = true;
+  supa.auth.signUp({email: em, password: pw, options: {data: {facility_name: nm, facility_type: tp}}})
+    .then(function(res){
+      if(res.error){ $('regBtn').disabled = false; authErr('⚠️ ' + res.error.message); return; }
+      var user = res.data.user;
+      if(!user || !res.data.session){ $('regBtn').disabled = false; authErr('⚠️ Check your email to confirm registration'); return; }
+      supa.from('tb_facilities').upsert({user_id: user.id, facility_name: nm, facility_type: tp})
+        .then(function(){ $('regBtn').disabled = false; afterLogin(user); });
+    });
+}
+function doLogout(){
+  if(supa) supa.auth.signOut();
+  currentUid = null; facility = {name:'', type:''}; records = [];
+  setFacChip(); showAuth();
+}
+function wireAuth(){
+  $('tabLogin').onclick = function(){
+    $('tabLogin').classList.add('on'); $('tabReg').classList.remove('on');
+    $('paneLogin').style.display = 'block'; $('paneReg').style.display = 'none'; authErr('');
+  };
+  $('tabReg').onclick = function(){
+    $('tabReg').classList.add('on'); $('tabLogin').classList.remove('on');
+    $('paneReg').style.display = 'block'; $('paneLogin').style.display = 'none'; authErr('');
+  };
+  $('loginBtn').onclick = doLogin;
+  $('regBtn').onclick = doRegister;
+  $('logoutBtn').onclick = function(){
+    confirmBox('⏻', 'Logout?', 'या सुविधेतून बाहेर पडायचे? Your forms stay saved on this device.', 'Logout', doLogout);
+  };
+}
 function uid(){ return 's' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function fmtDate(iso){
   if(!iso) return '—';
@@ -591,6 +781,10 @@ function openWizard(id){
   if(id){
     var rec = records.find(function(r){ return r.id === id; });
     if(rec) formData = Object.assign({}, rec.data);
+  } else if(facility.name){
+    /* pre-fill referring facility for this logged-in facility */
+    formData.facilityName = facility.name;
+    if(facility.type) formData.facilityType = facility.type;
   }
   $('homeScreen').style.display = 'none';
   $('wizScreen').style.display = 'block';
@@ -630,6 +824,8 @@ function saveRecord(silent){
     records.push({ id: editingId, data: Object.assign({}, formData), createdAt: now, updatedAt: now });
   }
   persist();
+  var saved = records.find(function(r){ return r.id === editingId; });
+  if(saved) cloudUpsert(saved);
   if(!silent) toast('✅ Form saved · अर्ज जतन झाला');
   updateStats();
   return true;
@@ -687,7 +883,7 @@ function renderList(q){
       else if(act === 'share') shareRecord(id);
       else if(act === 'del') confirmBox('🗑️', 'Delete this form?', 'हा अर्ज कायमचा हटवायचा का? This cannot be undone.', 'Delete', function(){
         records = records.filter(function(r){ return r.id !== id; });
-        persist(); renderList($('searchBox').value || ''); updateStats(); toast('🗑️ Deleted');
+        persist(); cloudDelete(id); renderList($('searchBox').value || ''); updateStats(); toast('🗑️ Deleted');
       });
     });
   });
@@ -943,7 +1139,20 @@ function shareRecord(id){
 
 /* ================= WIRING ================= */
 function init(){
-  loadStore();
+  wireAuth();
+  if(window.supabase && window.supabase.createClient){
+    try{ supa = window.supabase.createClient(SUPA_URL, SUPA_KEY); }catch(e){ supa = null; }
+  }
+  if(supa){
+    supa.auth.getSession().then(function(res){
+      if(res.data && res.data.session) afterLogin(res.data.session.user);
+      else showAuth();
+    });
+    supa.auth.onAuthStateChange(function(ev){ if(ev === 'SIGNED_OUT') showAuth(); });
+  } else {
+    authErr('⚠️ Internet needed for facility login · लॉगिनसाठी इंटरनेट आवश्यक');
+    showAuth();
+  }
   heroFx();
   buildRail();
   renderList('');
