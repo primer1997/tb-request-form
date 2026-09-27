@@ -1102,16 +1102,25 @@ function renderPrint(d){
 /* ================= EXPORT ================= */
 function isNativeApp(){ return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); }
 function nativePrint(data, name){
+  var done = false;
+  function ok(msg){ if(!done){ done = true; toast(msg); } }
+  function fail(msg){ if(!done){ done = true; toast('⚠️ ' + msg); } }
   try{
-    var css = document.getElementById('printCss').textContent;
+    if(!(window.Capacitor && window.Capacitor.isNativePlatform)){ fail('Print bridge not found'); return; }
+    if(!window.Capacitor.isNativePlatform()){ webPrint(data); return; }
+    var cssEl = document.getElementById('printCss');
+    if(!cssEl){ fail('Print styles missing'); return; }
     var doc = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=794">'
-      + '<style>@page{size:A4;margin:6mm}' + css + '</style></head><body>'
+      + '<style>@page{size:A4;margin:6mm}' + cssEl.textContent + '</style></head><body>'
       + renderPrint(data) + '</body></html>';
-    window.Capacitor.registerPlugin('Print').print({ html: doc, jobName: 'TB-Form-' + (name || (data && data.patientName) || 'record') });
-  }catch(e){ window.print(); }
+    var p = window.Capacitor.registerPlugin('Print').print({ html: doc, jobName: 'TB-Form-' + (name || (data && data.patientName) || 'record') });
+    setTimeout(function(){ fail('Print service not responding — tap again'); }, 8000);
+    if(p && typeof p.then === 'function'){
+      p.then(function(){ ok('🖨️ Opening print…'); }, function(err){ fail('Print error: ' + ((err && err.message) || err)); });
+    } else { ok('🖨️ Opening print…'); }
+  }catch(e){ fail('Print error: ' + ((e && e.message) || e)); }
 }
-function printRecord(data, name){
-  if(isNativeApp()){ nativePrint(data, name); return; }
+function webPrint(data){
   var pv = $('printView');
   pv.innerHTML = renderPrint(data);
   void pv.offsetHeight;
@@ -1120,6 +1129,11 @@ function printRecord(data, name){
       setTimeout(function(){ window.print(); }, 350);
     });
   });
+}
+function printRecord(data, name){
+  if(isNativeApp()){ nativePrint(data, name); return; }
+  if(/; wv\)/.test(navigator.userAgent || '')){ toast('⚠️ Print bridge not found'); return; }
+  webPrint(data);
 }
 function exportRecord(id){
   var rec = records.find(function(r){ return r.id === id; });
