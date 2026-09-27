@@ -745,7 +745,7 @@ function goStep(n, back){
     + '</div><div class="tt"><b>'+esc(sec.title)+'</b><span>'+esc(sec.mr)+'</span></div></div>'
     + stepBodyHTML(sec) + '</div>';
   if(curStep === SECTIONS.length - 1){
-    cardH += '<div class="export-hint">🖨️ <b>PDF</b> → Print → <b>Save as PDF</b> → share on WhatsApp<br>⬇️ <b>Download</b> saves a copy file · ↗️ <b>Share</b> sends it straight to WhatsApp<br><span style="font-size:12px">यादीतून प्रत्येक अर्जासाठी PDF / Download / Share बटणे वापरता येतील.</span></div>';
+    cardH += '<div class="export-hint">🖨️ <b>PDF</b> → Print → <b>Save as PDF</b> → share on WhatsApp<br><span style="font-size:12px">यादीतून प्रत्येक अर्जासाठी PDF बटण वापरता येईल.</span></div>';
   }
   pane.innerHTML = cardH;
   var body = $('wizBody');
@@ -878,8 +878,6 @@ function renderList(q){
       + '<div class="acts">'
       + '<button class="iconbtn" data-act="edit" data-id="' + r.id + '" title="Edit">✏️</button>'
       + '<button class="iconbtn" data-act="pdf" data-id="' + r.id + '" title="PDF">🖨️</button>'
-      + '<button class="iconbtn" data-act="dl" data-id="' + r.id + '" title="Download">⬇️</button>'
-      + '<button class="iconbtn" data-act="share" data-id="' + r.id + '" title="Share">↗️</button>'
       + '<button class="iconbtn del" data-act="del" data-id="' + r.id + '" title="Delete">🗑️</button>'
       + '</div></div>';
   }).join('');
@@ -888,8 +886,6 @@ function renderList(q){
       var id = b.dataset.id, act = b.dataset.act;
       if(act === 'edit') openWizard(id);
       else if(act === 'pdf') exportRecord(id);
-      else if(act === 'dl') downloadRecord(id);
-      else if(act === 'share') shareRecord(id);
       else if(act === 'del') confirmBox('🗑️', 'Delete this form?', 'हा अर्ज कायमचा हटवायचा का? This cannot be undone.', 'Delete', function(){
         records = records.filter(function(r){ return r.id !== id; });
         persist(); cloudDelete(id); renderList($('searchBox').value || ''); updateStats(); toast('🗑️ Deleted');
@@ -1117,35 +1113,6 @@ function exportRecord(id){
   if(!rec){ toast('⚠️ Record not found'); return; }
   printRecord(rec.data);
 }
-function standaloneHTML(data, name){
-  var css = '@page{size:A4;margin:6mm}body{font-family:Arial,sans-serif;color:#000;background:#fff}.pdoc{font-family:Arial,"Noto Sans Devanagari",sans-serif;font-size:9pt;line-height:1.25;color:#000;max-width:100%}.pdoc h1{font-size:12.5pt;text-align:center;margin:2px 0}.pdoc .psub{text-align:center;font-size:9.5pt}.pdoc .pannex{text-align:center;font-size:10.5pt;font-weight:bold;margin:2px 0 5px}.pg2{page-break-before:always}.ptab{width:100%;border-collapse:collapse;margin-bottom:4px;page-break-inside:avoid}.ptab td,.ptab th{border:1px solid #000;padding:2px 4px;vertical-align:top;font-size:9pt}.ptab th.sech{background:#e8e8e8;text-align:center;font-size:9.5pt;padding:3px 5px}.ptab th.c,.ptab td.c{text-align:center}.bx{display:inline-block;min-width:10px;height:10px;border:1.2px solid #000;font-size:8px;line-height:10px;text-align:center;vertical-align:-1px;margin-right:3px;font-weight:bold}.pline{margin:2px 0 4px;font-size:9pt}.pline.dl{font-size:8.5pt}.rsig{float:right}.pfoot{display:flex;justify-content:space-between;margin-top:8px;font-size:9pt;page-break-inside:avoid}.pfoot .sig{border-top:1px solid #000;padding-top:5px;width:31%;text-align:center}.pg1 .ptab{margin-bottom:11px}.pg1 .ptab td,.pg1 .ptab th{padding:4px 6px;font-size:10pt}.pg1 h1{font-size:14pt}.pg1 .pannex{margin:3px 0 7px}';
-  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>NTEP Form — ' + esc(name || 'record') + '</title>'
-    + '<style>' + css + '</style></head><body>' + renderPrint(data) + '</body></html>';
-}
-function downloadRecord(id){
-  var rec = records.find(function(r){ return r.id === id; });
-  if(!rec) return;
-  var name = (rec.data.patientName || 'ntep-form').replace(/[^\w\u0900-\u097F\- ]+/g, '').trim() || 'ntep-form';
-  var blob = new Blob([standaloneHTML(rec.data, name)], { type: 'text/html;charset=utf-8' });
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'NTEP-Form-' + name + '.html';
-  document.body.appendChild(a); a.click();
-  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 800);
-  toast('⬇️ Copy saved · प्रत जतन झाली');
-}
-function shareRecord(id){
-  var rec = records.find(function(r){ return r.id === id; });
-  if(!rec) return;
-  var name = (rec.data.patientName || 'ntep-form').replace(/[^\w\u0900-\u097F\- ]+/g, '').trim() || 'ntep-form';
-  var file = new File([standaloneHTML(rec.data, name)], 'NTEP-Form-' + name + '.html', { type: 'text/html' });
-  if(navigator.canShare && navigator.canShare({ files: [file] })){
-    navigator.share({ files: [file], title: 'NTEP Request Form' }).catch(function(){});
-  } else {
-    toast('⚠️ Share not supported — use Download');
-  }
-}
-
 /* ================= WIRING ================= */
 function init(){
   wireAuth();
@@ -1178,7 +1145,6 @@ function init(){
     else { if(saveRecord()){ var rec = records.find(function(r){ return r.id === editingId; }); printRecord(rec.data); } }
   });
   $('saveBtn').addEventListener('click', function(){ saveRecord(); });
-  // export buttons appear on the last step via context menu: long-press save = download/share
   $('saveBtn').addEventListener('contextmenu', function(e){ e.preventDefault(); });
 }
 document.addEventListener('DOMContentLoaded', init);
