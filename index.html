@@ -201,7 +201,8 @@ details.acc .acc-body{padding:4px 15px 16px;animation:fadeUp .3s both}
 </style>
 <style id="printCss">
 html,body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-.pdoc{font-family:Arial,"Noto Sans Devanagari",sans-serif;font-size:10pt;line-height:1.2;color:#000;max-width:100%}
+#printView{width:190mm;max-width:190mm;margin:0 auto}
+.pdoc{font-family:Arial,"Noto Sans Devanagari",sans-serif;font-size:10pt;line-height:1.2;color:#000;width:100%;max-width:100%}
 .pdoc h1{font-size:14pt;text-align:center;margin:2px 0}
 .pdoc .psub{text-align:center;font-size:10pt}
 .pdoc .pannex{text-align:center;font-size:12pt;font-weight:bold;margin:2px 0 5px}
@@ -1141,17 +1142,7 @@ function nativePrint(data, name){
 function webPrint(data){
   var pv = $('printView');
   pv.innerHTML = renderPrint(data);
-  // If the phone has a large system font size (e.g. Motorola), the browser
-  // scales up print output too (2 pages become 4). Detect the scaling via a
-  // 1-inch test element and apply inverse zoom so print is always 2 pages.
-  try{
-    var t = document.createElement('div');
-    t.style.cssText = 'width:1in;height:0;position:absolute;visibility:hidden;left:-9999px;top:0';
-    document.body.appendChild(t);
-    var sysScale = t.offsetWidth / 96;
-    document.body.removeChild(t);
-    pv.style.zoom = (sysScale > 1.02) ? (1 / sysScale).toFixed(3) : '';
-  }catch(e){ try{ pv.style.zoom = ''; }catch(_){} }
+  try{ pv.style.zoom = ''; }catch(e){}
   void pv.offsetHeight;
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
