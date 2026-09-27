@@ -186,6 +186,20 @@ details.acc .acc-body{padding:4px 15px 16px;animation:fadeUp .3s both}
 .fac-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
 .fac-chip{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);padding:7px 13px;border-radius:999px;font-size:13px;color:#fff;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .logoutbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:700}
+.setbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;margin-left:auto;flex:0 0 auto}
+.setbtn:active{transform:scale(.93)}
+.set-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px}
+.set-dialog{background:#fff;border-radius:16px;max-width:420px;width:100%;box-shadow:0 18px 50px rgba(0,0,0,.28);overflow:hidden}
+.set-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #e8eef0;background:#f4faf8}
+.set-head h3{margin:0;font-size:16px;color:#0d4a3a}
+.set-close{background:none;border:none;font-size:18px;cursor:pointer;color:#5a6b66;padding:4px 8px}
+.set-body{padding:16px}
+.set-group{margin-bottom:6px}
+.set-label{font-weight:800;color:#0d4a3a;margin-bottom:10px;font-size:14.5px}
+.set-opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1.5px solid #dfe9e6;border-radius:10px;margin-bottom:8px;cursor:pointer;font-size:13.5px;color:#243b35}
+.set-opt input{margin-top:3px;accent-color:#0d7a5f}
+.set-opt:has(input:checked){border-color:#0d7a5f;background:#eef8f4}
+.set-foot{padding:12px 16px;border-top:1px solid #e8eef0;display:flex;justify-content:flex-end}
 
 /* ---------- PRINT : official Annexure 15A, 2 pages ---------- */
 #printView{display:none}
@@ -271,6 +285,7 @@ details.acc .acc-body{padding:4px 15px 16px;animation:fadeUp .3s both}
         <div class="brand-row">
           <div class="logo"><svg width="38" height="38" viewBox="0 0 64 64" aria-label="TB logo"><rect x="29" y="4" width="6" height="13" rx="3" fill="#ffffff"/><path d="M32 17 L24 26 M32 17 L40 26" stroke="#ffffff" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M28 22 C20 23 14 30 13 40 C12 50 17 57 24 57.5 C27 57.7 29 56 29 52 L29 28 C29 24.5 28.7 22.8 28 22 Z" fill="#ffffff"/><path d="M36 22 C44 23 50 30 51 40 C52 50 47 57 40 57.5 C37 57.7 35 56 35 52 L35 28 C35 24.5 35.3 22.8 36 22 Z" fill="#ffffff"/><g fill="#d63031"><rect x="18.5" y="33" width="8" height="3.2" rx="1.6" transform="rotate(-18 22.5 34.6)"/><rect x="37.5" y="29" width="8" height="3.2" rx="1.6" transform="rotate(14 41.5 30.6)"/><rect x="28" y="43.5" width="8" height="3.2" rx="1.6" transform="rotate(-8 32 45.1)"/><rect x="23.5" y="40.5" width="5.2" height="2.8" rx="1.4" transform="rotate(22 26.1 41.9)"/></g></svg></div>
           <h1>TB Request Form<span class="mr">क्षयरोग नमुना तपासणी स्मार्ट अर्ज</span></h1>
+          <button class="setbtn" id="settingsBtn" type="button" title="Settings / सेटिंग्ज">⚙️</button>
         </div>
         <div class="fac-row" id="facRow" style="display:none">
           <span class="fac-chip">🏥 <b id="facName"></b></span>
@@ -1109,7 +1124,42 @@ function renderPrint(d){
 
 /* ================= EXPORT ================= */
 function isNativeApp(){ return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); }
+/* PDF export mode: 'fixed2' = always exactly 2 A4 pages (direct PDF, no print dialog);
+   'dialog' = system print dialog (page count may vary by phone). Default: fixed2. */
+function getPdfMode(){
+  try{ var m = localStorage.getItem('tb_pdf_mode'); return (m === 'dialog') ? 'dialog' : 'fixed2'; }
+  catch(e){ return 'fixed2'; }
+}
+function setPdfMode(m){
+  try{ localStorage.setItem('tb_pdf_mode', (m === 'dialog') ? 'dialog' : 'fixed2'); }catch(e){}
+}
+function buildPrintDoc(data){
+  var cssEl = document.getElementById('printCss');
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=794">'
+    + '<style>@page{size:A4;margin:6mm}body{width:794px;margin:0 auto;padding:0}' + (cssEl ? cssEl.textContent : '') + '</style></head><body>'
+    + renderPrint(data) + '</body></html>';
+}
+function nativeGeneratePdf(data, name){
+  var done = false;
+  function ok(msg){ if(!done){ done = true; toast(msg); } }
+  function fail(msg){ if(!done){ done = true; toast('⚠️ ' + msg); } }
+  try{
+    var Cap = window.Capacitor;
+    if(!(Cap && Cap.isNativePlatform && Cap.isNativePlatform())){ webPrint(data); return; }
+    var PrintNative = Cap.Plugins && Cap.Plugins.Print;
+    if(!PrintNative || typeof PrintNative.generatePdf !== 'function'){ fail('PDF plugin not found — update the app'); return; }
+    var doc = buildPrintDoc(data);
+    var fname = 'TB-Form-' + (name || (data && data.patientName) || 'record').toString().replace(/[^\w\-]+/g, '_') + '.pdf';
+    var p = PrintNative.generatePdf({ html: doc, fileName: fname });
+    setTimeout(function(){ fail('PDF service not responding — tap again'); }, 15000);
+    if(p && typeof p.then === 'function'){
+      p.then(function(){ ok('📄 PDF ready — choose where to share'); }, function(err){ fail('PDF error: ' + ((err && err.message) || err)); });
+    } else { ok('📄 Generating PDF…'); }
+  }catch(e){ fail('PDF error: ' + ((e && e.message) || e)); }
+}
 function nativePrint(data, name){
+  // Fixed 2-page mode uses direct PDF generation (no print dialog).
+  if(getPdfMode() === 'fixed2'){ nativeGeneratePdf(data, name); return; }
   var done = false;
   function ok(msg){ if(!done){ done = true; toast(msg); } }
   function fail(msg){ if(!done){ done = true; toast('⚠️ ' + msg); } }
@@ -1119,11 +1169,7 @@ function nativePrint(data, name){
     if(!Cap.isNativePlatform()){ webPrint(data); return; }
     var PrintNative = Cap.Plugins && Cap.Plugins.Print;
     if(!PrintNative || typeof PrintNative.print !== 'function'){ fail('Print plugin not found'); return; }
-    var cssEl = document.getElementById('printCss');
-    if(!cssEl){ fail('Print styles missing'); return; }
-    var doc = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=794">'
-      + '<style>@page{size:A4;margin:6mm}body{width:794px;margin:0 auto;padding:0}' + cssEl.textContent + '</style></head><body>'
-      + renderPrint(data) + '</body></html>';
+    var doc = buildPrintDoc(data);
     var p = PrintNative.print({ html: doc, jobName: 'TB-Form-' + (name || (data && data.patientName) || 'record') });
     setTimeout(function(){ fail('Print service not responding — tap again'); }, 8000);
     if(p && typeof p.then === 'function'){
@@ -1174,6 +1220,25 @@ function init(){
 
   $('newFormBtn').addEventListener('click', function(){ openWizard(null); });
   $('searchBox').addEventListener('input', function(){ renderList($('searchBox').value); });
+  // Settings dialog wiring
+  (function(){
+    var overlay = $('settingsOverlay');
+    function openSettings(){
+      var mode = getPdfMode();
+      $('pdfModeFixed2').checked = (mode === 'fixed2');
+      $('pdfModeDialog').checked = (mode === 'dialog');
+      overlay.style.display = 'flex';
+    }
+    function closeSettings(){ overlay.style.display = 'none'; }
+    $('settingsBtn').addEventListener('click', openSettings);
+    $('settingsClose').addEventListener('click', closeSettings);
+    overlay.addEventListener('click', function(e){ if(e.target === overlay) closeSettings(); });
+    $('settingsSave').addEventListener('click', function(){
+      setPdfMode($('pdfModeDialog').checked ? 'dialog' : 'fixed2');
+      closeSettings();
+      toast('✅ Settings saved');
+    });
+  })();
   $('wizBack').addEventListener('click', function(){
     if(curStep === 0) closeWizard(); else goStep(curStep - 1, true);
   });
@@ -1187,5 +1252,31 @@ function init(){
 }
 document.addEventListener('DOMContentLoaded', init);
 </script>
+
+<!-- ============ SETTINGS DIALOG ============ -->
+<div class="set-overlay" id="settingsOverlay" style="display:none">
+  <div class="set-dialog">
+    <div class="set-head">
+      <h3>⚙️ Settings <span class="mr">सेटिंग्ज</span></h3>
+      <button class="set-close" id="settingsClose" type="button">✕</button>
+    </div>
+    <div class="set-body">
+      <div class="set-group">
+        <div class="set-label">📄 PDF Export <span class="mr">पीडीएफ</span></div>
+        <label class="set-opt">
+          <input type="radio" name="pdfMode" value="fixed2" id="pdfModeFixed2">
+          <span><b>Fixed 2 pages</b> <span class="mr">— always exactly 2 A4 pages on any phone (recommended)</span></span>
+        </label>
+        <label class="set-opt">
+          <input type="radio" name="pdfMode" value="dialog" id="pdfModeDialog">
+          <span><b>Print dialog</b> <span class="mr">— system print dialog (pages may vary by phone)</span></span>
+        </label>
+      </div>
+    </div>
+    <div class="set-foot">
+      <button class="btn primary" id="settingsSave" type="button">Save / जतन करा</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
