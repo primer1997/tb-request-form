@@ -1106,14 +1106,17 @@ function nativePrint(data, name){
   function ok(msg){ if(!done){ done = true; toast(msg); } }
   function fail(msg){ if(!done){ done = true; toast('⚠️ ' + msg); } }
   try{
-    if(!(window.Capacitor && window.Capacitor.isNativePlatform)){ fail('Print bridge not found'); return; }
-    if(!window.Capacitor.isNativePlatform()){ webPrint(data); return; }
+    var Cap = window.Capacitor;
+    if(!(Cap && Cap.isNativePlatform)){ fail('Print bridge not found'); return; }
+    if(!Cap.isNativePlatform()){ webPrint(data); return; }
+    var PrintNative = Cap.Plugins && Cap.Plugins.Print;
+    if(!PrintNative || typeof PrintNative.print !== 'function'){ fail('Print plugin not found'); return; }
     var cssEl = document.getElementById('printCss');
     if(!cssEl){ fail('Print styles missing'); return; }
     var doc = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=794">'
       + '<style>@page{size:A4;margin:6mm}' + cssEl.textContent + '</style></head><body>'
       + renderPrint(data) + '</body></html>';
-    var p = window.Capacitor.registerPlugin('Print').print({ html: doc, jobName: 'TB-Form-' + (name || (data && data.patientName) || 'record') });
+    var p = PrintNative.print({ html: doc, jobName: 'TB-Form-' + (name || (data && data.patientName) || 'record') });
     setTimeout(function(){ fail('Print service not responding — tap again'); }, 8000);
     if(p && typeof p.then === 'function'){
       p.then(function(){ ok('🖨️ Opening print…'); }, function(err){ fail('Print error: ' + ((err && err.message) || err)); });
