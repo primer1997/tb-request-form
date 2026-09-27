@@ -1141,6 +1141,17 @@ function nativePrint(data, name){
 function webPrint(data){
   var pv = $('printView');
   pv.innerHTML = renderPrint(data);
+  // If the phone has a large system font size (e.g. Motorola), the browser
+  // scales up print output too (2 pages become 4). Detect the scaling via a
+  // 1-inch test element and apply inverse zoom so print is always 2 pages.
+  try{
+    var t = document.createElement('div');
+    t.style.cssText = 'width:1in;height:0;position:absolute;visibility:hidden;left:-9999px;top:0';
+    document.body.appendChild(t);
+    var sysScale = t.offsetWidth / 96;
+    document.body.removeChild(t);
+    pv.style.zoom = (sysScale > 1.02) ? (1 / sysScale).toFixed(3) : '';
+  }catch(e){ try{ pv.style.zoom = ''; }catch(_){} }
   void pv.offsetHeight;
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
