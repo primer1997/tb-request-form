@@ -1165,14 +1165,15 @@ function webPrint(data){
     try{
       var pdf = new jspdf.jsPDF('p', 'mm', 'a4');
       var PW = 210, PH = 297;
+      var M = 10; /* margin on all four sides (mm) */
+      var CW = PW - (M * 2), CH = PH - (M * 2);
       canvases.forEach(function(cv, i){
         if(i > 0) pdf.addPage();
         var img = cv.toDataURL('image/jpeg', 0.92);
-        var h = (cv.height * PW) / cv.width;
-        if(h > PH) h = PH;
-        var y = (PH - h) / 2;
-        if(y < 0) y = 0;
-        pdf.addImage(img, 'JPEG', 0, y, PW, h);
+        var h = (cv.height * CW) / cv.width;
+        if(h > CH) h = CH;
+        var y = M + ((CH - h) / 2);
+        pdf.addImage(img, 'JPEG', M, y, CW, h);
       });
       var fname = 'TB-Form-' + ((data && data.patientName) || 'record').toString().replace(/[^\w\-]+/g, '_') + '.pdf';
       // Prefer native share sheet (mobile) so user can send via WhatsApp etc.
