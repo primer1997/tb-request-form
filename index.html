@@ -10,6 +10,8 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 /* ============ NTEP SMART FORM — fresh build v1 ============ */
 *{box-sizing:border-box;margin:0;padding:0}
@@ -757,7 +759,7 @@ function goStep(n, back){
     + '</div><div class="tt"><b>'+esc(sec.title)+'</b><span>'+esc(sec.mr)+'</span></div></div>'
     + stepBodyHTML(sec) + '</div>';
   if(curStep === SECTIONS.length - 1){
-    cardH += '<div class="export-hint">🖨️ <b>PDF</b> → Print → <b>Save as PDF</b> → share on WhatsApp<br><span style="font-size:12px">यादीतून प्रत्येक अर्जासाठी PDF बटण वापरता येईल.</span></div>';
+    cardH += '<div class="export-hint">🖨️ <b>PDF</b> बटण दाबा → २ पेज PDF तयार होऊन शेअर करता येईल (WhatsApp)<br><span style="font-size:12px">यादीतून प्रत्येक अर्जासाठी PDF बटण वापरता येईल.</span></div>';
   }
   pane.innerHTML = cardH;
   var body = $('wizBody');
@@ -1139,15 +1141,55 @@ function nativePrint(data, name){
   // Always use direct 2-page PDF generation (no print dialog, no setting).
   nativeGeneratePdf(data, name);
 }
+/* Direct 2-page PDF generation for web — works identically on any device/browser.
+   Renders the form HTML to canvas (html2canvas) and builds a fixed 2-page A4 PDF (jsPDF).
+   No window.print(), no browser print dialog, no device-dependent pagination. */
 function webPrint(data){
   var pv = $('printView');
   pv.innerHTML = renderPrint(data);
-  try{ pv.style.zoom = ''; }catch(e){}
-  void pv.offsetHeight;
-  requestAnimationFrame(function(){
-    requestAnimationFrame(function(){
-      setTimeout(function(){ window.print(); }, 350);
-    });
+  if(typeof html2canvas === 'undefined' || typeof jspdf === 'undefined'){
+    toast('⚠️ PDF library loading… tap again in a moment');
+    return;
+  }
+  toast('📄 Generating 2-page PDF…');
+  // Make printView renderable off-screen (html2canvas needs visible layout)
+  var prevCss = pv.style.cssText;
+  pv.style.cssText = 'display:block;position:fixed;left:-9999px;top:0;width:794px;background:#fff;color:#000';
+  var pg1 = pv.querySelector('.pg1');
+  var pg2 = pv.querySelector('.pg2');
+  function render(el){
+    return html2canvas(el, {scale:2, backgroundColor:'#ffffff', useCORS:true, logging:false});
+  }
+  Promise.all([render(pg1), render(pg2)]).then(function(canvases){
+    pv.style.cssText = prevCss;
+    try{
+      var pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+      var PW = 210, PH = 297;
+      canvases.forEach(function(cv, i){
+        if(i > 0) pdf.addPage();
+        var img = cv.toDataURL('image/jpeg', 0.92);
+        var h = (cv.height * PW) / cv.width;
+        if(h > PH) h = PH;
+        var y = (PH - h) / 2;
+        if(y < 0) y = 0;
+        pdf.addImage(img, 'JPEG', 0, y, PW, h);
+      });
+      var fname = 'TB-Form-' + ((data && data.patientName) || 'record').toString().replace(/[^\w\-]+/g, '_') + '.pdf';
+      // Prefer native share sheet (mobile) so user can send via WhatsApp etc.
+      var blob = pdf.output('blob');
+      var file = new File([blob], fname, {type:'application/pdf'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        navigator.share({files:[file], title:fname}).catch(function(){ pdf.save(fname); });
+      } else {
+        pdf.save(fname);
+      }
+      toast('✅ 2-page PDF ready');
+    }catch(e){
+      toast('⚠️ PDF error: ' + ((e && e.message) || e));
+    }
+  }).catch(function(e){
+    pv.style.cssText = prevCss;
+    toast('⚠️ PDF error: ' + ((e && e.message) || e));
   });
 }
 function printRecord(data, name){
