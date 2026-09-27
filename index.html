@@ -1122,7 +1122,7 @@ function nativePrint(data, name){
     var cssEl = document.getElementById('printCss');
     if(!cssEl){ fail('Print styles missing'); return; }
     var doc = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=794">'
-      + '<style>@page{size:A4;margin:6mm}' + cssEl.textContent + '</style></head><body>'
+      + '<style>@page{size:A4;margin:6mm}body{width:794px;margin:0 auto;padding:0}' + cssEl.textContent + '</style></head><body>'
       + renderPrint(data) + '</body></html>';
     var p = PrintNative.print({ html: doc, jobName: 'TB-Form-' + (name || (data && data.patientName) || 'record') });
     setTimeout(function(){ fail('Print service not responding — tap again'); }, 8000);
