@@ -349,7 +349,6 @@ html,body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
           <div class="fld"><label class="lbl">Facility type <span class="mr">सुविधेचा प्रकार</span></label><select id="bk_facilityType"><option value=""></option><option>PHI</option><option>DMC</option><option>TU</option><option>DTC</option><option>ICTC</option><option>ART</option><option>Medical College</option><option>DR-TB Centre</option><option>Private</option><option>Others</option></select></div>
           <div class="fld"><label class="lbl">Requested by <span class="mr">विनंती करणारे (पदनाम)</span></label><input id="bk_requestedBy" placeholder="Designation"></div>
           <div class="fld"><label class="lbl">Contact number <span class="mr">संपर्क क्रमांक</span></label><input id="bk_reqContact" inputmode="numeric" maxlength="10" placeholder="10 digits"></div>
-          <div class="fld"><label class="lbl">Health Establishment ID (NIKSHAY) <span class="mr">संस्था आयडी</span></label><input id="bk_healthEstId" placeholder="Facility Nikshay ID"></div>
           <div class="fld"><label class="lbl">State <span class="mr">राज्य</span></label><input id="bk_state" placeholder="State"></div>
           <div class="fld"><label class="lbl">District <span class="mr">जिल्हा</span></label><input id="bk_district" placeholder="District"></div>
           <div class="fld"><label class="lbl">Tuberculosis Unit (TU) <span class="mr">क्षयरोग विभाग</span></label><input id="bk_tu" placeholder="TU"></div>
@@ -367,7 +366,7 @@ html,body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
       <div class="card" style="--d:.1s">
         <div class="sec-head"><div class="badge">🧑</div><div class="tt"><b>Patients</b><span>प्रत्येक ओळीत एक रुग्ण · one patient per row</span></div></div>
         <div class="bulk-wrap"><table class="bulk-table">
-          <thead><tr><th>#</th><th>Patient name *</th><th>Age</th><th>Gender</th><th>Mobile</th><th>Nikshay ID</th><th>Specimen date</th><th>Specimen type</th><th>Address</th><th>Symptom</th><th>Days</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>Patient name *</th><th>Age</th><th>Gender</th><th>Mobile</th><th>Health Est. ID</th><th>Specimen date</th><th>Specimen type</th><th>Address</th><th>Symptom</th><th>Days</th><th></th></tr></thead>
           <tbody id="bulkBody"></tbody>
         </table></div>
         <button class="btn btn-ghost" id="bulkAddRow" type="button" style="margin-top:10px">＋ Add row · ओळ जोडा</button>
@@ -924,7 +923,7 @@ function bulkRowHTML(){
   + '<td><input data-c="age" type="number" min="0" max="130" placeholder="Age" style="width:62px"></td>'
   + '<td><select data-c="gender" style="width:64px"><option value=""></option><option>M</option><option>F</option><option>TG</option></select></td>'
   + '<td><input data-c="mobile" inputmode="numeric" maxlength="10" placeholder="10 digits" style="width:104px"></td>'
-  + '<td><input data-c="nikshayId" placeholder="Nikshay ID" style="width:120px"></td>'
+  + '<td><input data-c="healthEstId" placeholder="Health Est. ID (NIKSHAY)" style="width:130px"></td>'
   + '<td><input data-c="specimenDate" type="date" style="width:132px"></td>'
   + '<td><select data-c="specimenType" style="width:96px"><option>Sputum</option><option>Other</option></select></td>'
   + '<td><input data-c="address" placeholder="Address + landmark" style="width:150px"></td>'
@@ -955,7 +954,6 @@ function openBulk(){
   $('bk_facilityType').value = facility.type || '';
   /* remember facility-level details between sessions */
   try{
-    $('bk_healthEstId').value = localStorage.getItem('bk_mem_healthEstId') || '';
     $('bk_state').value = localStorage.getItem('bk_mem_state') || '';
     $('bk_district').value = localStorage.getItem('bk_mem_district') || '';
     $('bk_tu').value = localStorage.getItem('bk_mem_tu') || '';
@@ -978,7 +976,6 @@ function bulkSave(){
   var common = {
     facilityName: $('bk_facilityName').value.trim(),
     facilityType: $('bk_facilityType').value,
-    healthEstId: $('bk_healthEstId').value.trim(),
     state: $('bk_state').value.trim(),
     district: $('bk_district').value.trim(),
     tu: $('bk_tu').value.trim(),
@@ -1007,7 +1004,6 @@ function bulkSave(){
   }
   if(!saved){ toast('⚠️ No patient rows filled · एकही ओळ भरलेली नाही'); return; }
   try{
-    localStorage.setItem('bk_mem_healthEstId', common.healthEstId);
     localStorage.setItem('bk_mem_state', common.state);
     localStorage.setItem('bk_mem_district', common.district);
     localStorage.setItem('bk_mem_tu', common.tu);
