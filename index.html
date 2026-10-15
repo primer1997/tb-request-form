@@ -1345,7 +1345,7 @@ function webPrint(data, pdfTab){
       // Prefer native share sheet (mobile) so user can send via WhatsApp etc.
       var blob = pdf.output('blob');
       var file = new File([blob], fname, {type:'application/pdf'});
-      if(navigator.canShare && navigator.canShare({files:[file]})){
+      if(canNativeShare()){
         if(pdfTab && !pdfTab.closed) pdfTab.close();
         navigator.share({files:[file], title:fname}).catch(function(){ downloadPdf(blob, fname); });
         toast('📄 PDF ready — choose where to share');
@@ -1368,13 +1368,18 @@ function webPrint(data, pdfTab){
     toast('⚠️ PDF error: ' + ((e && e.message) || e));
   });
 }
+/* True only on mobile devices whose browser can share files (share sheet). */
+function canNativeShare(){
+  try{
+    if(!/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '')) return false;
+    var f = new File([new Blob(['x'], {type:'application/pdf'})], 't.pdf', {type:'application/pdf'});
+    return !!(navigator.canShare && navigator.canShare({files:[f]}));
+  }catch(e){ return false; }
+}
 /* Open a blank tab synchronously inside the click gesture so desktop popup
    blockers allow it; the generated PDF is loaded into it when ready. */
 function preOpenPdfTab(){
-  try{
-    var f = new File([new Blob(['x'], {type:'application/pdf'})], 't.pdf', {type:'application/pdf'});
-    if(navigator.canShare && navigator.canShare({files:[f]})) return null; /* mobile: share sheet instead */
-  }catch(e){}
+  if(canNativeShare()) return null; /* mobile: share sheet instead */
   try{ return window.open('about:blank', '_blank'); }catch(e){ return null; }
 }
 function downloadPdf(blob, fname){
