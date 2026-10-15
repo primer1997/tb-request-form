@@ -1310,7 +1310,7 @@ function nativePrint(data, name){
 /* Direct 2-page PDF generation for web — works identically on any device/browser.
    Renders the form HTML to canvas (html2canvas) and builds a fixed 2-page A4 PDF (jsPDF).
    No window.print(), no browser print dialog, no device-dependent pagination. */
-function webPrint(data){
+function webPrint(data, pdfTab){
   var pv = $('printView');
   pv.innerHTML = renderPrint(data);
   if(typeof html2canvas === 'undefined' || typeof jspdf === 'undefined'){
@@ -1346,23 +1346,49 @@ function webPrint(data){
       var blob = pdf.output('blob');
       var file = new File([blob], fname, {type:'application/pdf'});
       if(navigator.canShare && navigator.canShare({files:[file]})){
-        navigator.share({files:[file], title:fname}).catch(function(){ pdf.save(fname); });
+        if(pdfTab && !pdfTab.closed) pdfTab.close();
+        navigator.share({files:[file], title:fname}).catch(function(){ downloadPdf(blob, fname); });
+        toast('📄 PDF ready — choose where to share');
+      } else if(pdfTab && !pdfTab.closed){
+        /* desktop: load the PDF into the pre-opened tab */
+        var url = URL.createObjectURL(blob);
+        pdfTab.location.href = url;
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 120000);
+        toast('✅ 2-page PDF opened in new tab');
       } else {
-        pdf.save(fname);
+        downloadPdf(blob, fname);
       }
-      toast('✅ 2-page PDF ready');
     }catch(e){
+      if(pdfTab && !pdfTab.closed) pdfTab.close();
       toast('⚠️ PDF error: ' + ((e && e.message) || e));
     }
   }).catch(function(e){
     pv.style.cssText = prevCss;
+    if(pdfTab && !pdfTab.closed) pdfTab.close();
     toast('⚠️ PDF error: ' + ((e && e.message) || e));
   });
+}
+/* Open a blank tab synchronously inside the click gesture so desktop popup
+   blockers allow it; the generated PDF is loaded into it when ready. */
+function preOpenPdfTab(){
+  try{
+    var f = new File([new Blob(['x'], {type:'application/pdf'})], 't.pdf', {type:'application/pdf'});
+    if(navigator.canShare && navigator.canShare({files:[f]})) return null; /* mobile: share sheet instead */
+  }catch(e){}
+  try{ return window.open('about:blank', '_blank'); }catch(e){ return null; }
+}
+function downloadPdf(blob, fname){
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = fname;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ a.remove(); URL.revokeObjectURL(url); }, 4000);
+  toast('📥 PDF downloaded · PDF डाउनलोड झाले');
 }
 function printRecord(data, name){
   if(isNativeApp()){ nativePrint(data, name); return; }
   if(/; wv\)/.test(navigator.userAgent || '')){ toast('⚠️ Print bridge not found'); return; }
-  webPrint(data);
+  webPrint(data, preOpenPdfTab());
 }
 function exportRecord(id){
   var rec = records.find(function(r){ return r.id === id; });
