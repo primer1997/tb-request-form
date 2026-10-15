@@ -363,7 +363,7 @@ html,body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
       <div class="card" style="--d:.1s">
         <div class="sec-head"><div class="badge">🧑</div><div class="tt"><b>Patients</b><span>प्रत्येक ओळीत एक रुग्ण · one patient per row</span></div></div>
         <div class="bulk-wrap"><table class="bulk-table">
-          <thead><tr><th>#</th><th>Patient name *</th><th>Age</th><th>Gender</th><th>Mobile</th><th>Aadhar</th><th>Specimen date</th><th>Specimen type</th><th>Address</th><th>Symptom</th><th>Days</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>Patient name *</th><th>Age</th><th>Gender</th><th>Mobile</th><th>Nikshay ID</th><th>Specimen date</th><th>Specimen type</th><th>Address</th><th>Symptom</th><th>Days</th><th></th></tr></thead>
           <tbody id="bulkBody"></tbody>
         </table></div>
         <button class="btn btn-ghost" id="bulkAddRow" type="button" style="margin-top:10px">＋ Add row · ओळ जोडा</button>
@@ -920,7 +920,7 @@ function bulkRowHTML(){
   + '<td><input data-c="age" type="number" min="0" max="130" placeholder="Age" style="width:62px"></td>'
   + '<td><select data-c="gender" style="width:64px"><option value=""></option><option>M</option><option>F</option><option>TG</option></select></td>'
   + '<td><input data-c="mobile" inputmode="numeric" maxlength="10" placeholder="10 digits" style="width:104px"></td>'
-  + '<td><input data-c="aadhar" inputmode="numeric" maxlength="12" placeholder="12 digits" style="width:112px"></td>'
+  + '<td><input data-c="nikshayId" placeholder="Nikshay ID" style="width:120px"></td>'
   + '<td><input data-c="specimenDate" type="date" style="width:132px"></td>'
   + '<td><select data-c="specimenType" style="width:96px"><option>Sputum</option><option>Other</option></select></td>'
   + '<td><input data-c="address" placeholder="Address + landmark" style="width:150px"></td>'
@@ -983,8 +983,6 @@ function bulkSave(){
     if(!d.patientName){ toast('⚠️ Row ' + (i + 1) + ': patient name required · नाव आवश्यक'); return; }
     var m = (d.mobile || '').replace(/\D/g, '');
     if(m && m.length !== 10){ toast('⚠️ Row ' + (i + 1) + ': mobile must be 10 digits'); return; }
-    var a = (d.aadhar || '').replace(/\D/g, '');
-    if(a && a.length !== 12){ toast('⚠️ Row ' + (i + 1) + ': aadhar must be 12 digits'); return; }
     var rec = { id: uid(), data: Object.assign({}, common, d), createdAt: now, updatedAt: now };
     records.push(rec);
     cloudUpsert(rec);
