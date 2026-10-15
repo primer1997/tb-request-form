@@ -83,7 +83,7 @@ textarea{min-height:64px;resize:vertical}
 .bulkbtn{width:100%;margin-top:10px;padding:14px;border-radius:18px;background:#fff;border:2px dashed var(--teal);color:var(--teal-d);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:var(--sh);transition:transform .15s;animation:fadeUp .6s .32s both}
 .bulkbtn:active{transform:scale(.97)}
 .bulk-wrap{overflow-x:auto;margin:0 -6px;padding:2px 6px 8px;-webkit-overflow-scrolling:touch}
-.bulk-table{border-collapse:collapse;min-width:820px;width:100%}
+.bulk-table{border-collapse:collapse;min-width:1020px;width:100%}
 .bulk-table th{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);text-align:left;padding:6px 4px;white-space:nowrap}
 .bulk-table td{padding:3px;vertical-align:middle}
 .bulk-table .rn{font-weight:800;color:var(--mut);font-size:13px;text-align:center;min-width:26px}
@@ -365,7 +365,7 @@ html,body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
       <div class="card" style="--d:.1s">
         <div class="sec-head"><div class="badge">🧑</div><div class="tt"><b>Patients</b><span>प्रत्येक ओळीत एक रुग्ण · one patient per row</span></div></div>
         <div class="bulk-wrap"><table class="bulk-table">
-          <thead><tr><th>#</th><th>Patient name *</th><th>Age</th><th>Gender</th><th>Mobile</th><th>Aadhar</th><th>Address</th><th>Symptom</th><th>Days</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>Patient name *</th><th>Age</th><th>Gender</th><th>Mobile</th><th>Aadhar</th><th>Specimen date</th><th>Specimen type</th><th>Address</th><th>Symptom</th><th>Days</th><th></th></tr></thead>
           <tbody id="bulkBody"></tbody>
         </table></div>
         <button class="btn btn-ghost" id="bulkAddRow" type="button" style="margin-top:10px">＋ Add row · ओळ जोडा</button>
@@ -923,6 +923,8 @@ function bulkRowHTML(){
   + '<td><select data-c="gender" style="width:64px"><option value=""></option><option>M</option><option>F</option><option>TG</option></select></td>'
   + '<td><input data-c="mobile" inputmode="numeric" maxlength="10" placeholder="10 digits" style="width:104px"></td>'
   + '<td><input data-c="aadhar" inputmode="numeric" maxlength="12" placeholder="12 digits" style="width:112px"></td>'
+  + '<td><input data-c="specimenDate" type="date" style="width:132px"></td>'
+  + '<td><select data-c="specimenType" style="width:96px"><option value="">Default</option><option>Sputum</option><option>Other</option></select></td>'
   + '<td><input data-c="address" placeholder="Address + landmark" style="width:150px"></td>'
   + '<td><input data-c="symptom" placeholder="Symptom" style="width:110px"></td>'
   + '<td><input data-c="symptomDays" type="number" min="0" placeholder="Days" style="width:60px"></td>'
@@ -935,6 +937,12 @@ function renumberBulk(){
 }
 function bulkAddRow(){
   $('bulkBody').insertAdjacentHTML('beforeend', bulkRowHTML());
+  var tr = $('bulkBody').rows[$('bulkBody').rows.length - 1];
+  /* pre-fill per-row specimen fields from the common defaults */
+  var sd = tr.querySelector('[data-c="specimenDate"]');
+  var st = tr.querySelector('[data-c="specimenType"]');
+  if(sd && $('bk_specimenDate')) sd.value = $('bk_specimenDate').value || '';
+  if(st && $('bk_specimenType')) st.value = '';
   renumberBulk();
 }
 function openBulk(){
@@ -974,9 +982,14 @@ function bulkSave(){
   for(var i = 0; i < trs.length; i++){
     var d = {}, empty = true;
     trs[i].querySelectorAll('[data-c]').forEach(function(el){
-      var v = el.value.trim(); d[el.dataset.c] = v; if(v) empty = false;
+      var v = el.value.trim(); d[el.dataset.c] = v;
+      /* pre-filled specimen defaults don't count as "row filled" */
+      if(v && el.dataset.c !== 'specimenDate' && el.dataset.c !== 'specimenType') empty = false;
     });
     if(empty) continue;
+    /* row's own specimen date/type win; empty falls back to the common defaults */
+    if(!d.specimenDate) delete d.specimenDate;
+    if(!d.specimenType) delete d.specimenType;
     if(!d.patientName){ toast('⚠️ Row ' + (i + 1) + ': patient name required · नाव आवश्यक'); return; }
     var m = (d.mobile || '').replace(/\D/g, '');
     if(m && m.length !== 10){ toast('⚠️ Row ' + (i + 1) + ': mobile must be 10 digits'); return; }
