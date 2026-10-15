@@ -347,8 +347,6 @@ html,body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
         <div class="grid2">
           <div class="fld"><label class="lbl">Facility name <span class="mr">सुविधेचे नाव</span></label><input id="bk_facilityName" placeholder="Facility name"></div>
           <div class="fld"><label class="lbl">Facility type <span class="mr">सुविधेचा प्रकार</span></label><select id="bk_facilityType"><option value=""></option><option>PHI</option><option>DMC</option><option>TU</option><option>DTC</option><option>ICTC</option><option>ART</option><option>Medical College</option><option>DR-TB Centre</option><option>Private</option><option>Others</option></select></div>
-          <div class="fld"><label class="lbl">Specimen date <span class="mr">नमुना तारीख</span></label><input type="date" id="bk_specimenDate"></div>
-          <div class="fld"><label class="lbl">Specimen type <span class="mr">नमुन्याचा प्रकार</span></label><select id="bk_specimenType"><option>Sputum</option><option>Other</option></select></div>
           <div class="fld"><label class="lbl">Requested by <span class="mr">विनंती करणारे (पदनाम)</span></label><input id="bk_requestedBy" placeholder="Designation"></div>
           <div class="fld"><label class="lbl">Contact number <span class="mr">संपर्क क्रमांक</span></label><input id="bk_reqContact" inputmode="numeric" maxlength="10" placeholder="10 digits"></div>
         </div>
@@ -924,7 +922,7 @@ function bulkRowHTML(){
   + '<td><input data-c="mobile" inputmode="numeric" maxlength="10" placeholder="10 digits" style="width:104px"></td>'
   + '<td><input data-c="aadhar" inputmode="numeric" maxlength="12" placeholder="12 digits" style="width:112px"></td>'
   + '<td><input data-c="specimenDate" type="date" style="width:132px"></td>'
-  + '<td><select data-c="specimenType" style="width:96px"><option value="">Default</option><option>Sputum</option><option>Other</option></select></td>'
+  + '<td><select data-c="specimenType" style="width:96px"><option>Sputum</option><option>Other</option></select></td>'
   + '<td><input data-c="address" placeholder="Address + landmark" style="width:150px"></td>'
   + '<td><input data-c="symptom" placeholder="Symptom" style="width:110px"></td>'
   + '<td><input data-c="symptomDays" type="number" min="0" placeholder="Days" style="width:60px"></td>'
@@ -938,11 +936,9 @@ function renumberBulk(){
 function bulkAddRow(){
   $('bulkBody').insertAdjacentHTML('beforeend', bulkRowHTML());
   var tr = $('bulkBody').rows[$('bulkBody').rows.length - 1];
-  /* pre-fill per-row specimen fields from the common defaults */
+  /* each row gets its own date, defaulting to today */
   var sd = tr.querySelector('[data-c="specimenDate"]');
-  var st = tr.querySelector('[data-c="specimenType"]');
-  if(sd && $('bk_specimenDate')) sd.value = $('bk_specimenDate').value || '';
-  if(st && $('bk_specimenType')) st.value = '';
+  if(sd) sd.value = new Date().toISOString().slice(0, 10);
   renumberBulk();
 }
 function openBulk(){
@@ -953,7 +949,6 @@ function openBulk(){
   $('bulkActions').style.display = 'flex';
   $('bk_facilityName').value = facility.name || '';
   $('bk_facilityType').value = facility.type || '';
-  $('bk_specimenDate').value = new Date().toISOString().slice(0, 10);
   $('bulkBody').innerHTML = '';
   for(var i = 0; i < 5; i++) bulkAddRow();
   window.scrollTo(0, 0);
@@ -970,8 +965,6 @@ function bulkSave(){
   var common = {
     facilityName: $('bk_facilityName').value.trim(),
     facilityType: $('bk_facilityType').value,
-    specimenDate: $('bk_specimenDate').value,
-    specimenType: $('bk_specimenType').value,
     requestedBy: $('bk_requestedBy').value.trim(),
     reqContact: $('bk_reqContact').value.replace(/\D/g, ''),
     tb_presumptive: true
@@ -987,9 +980,6 @@ function bulkSave(){
       if(v && el.dataset.c !== 'specimenDate' && el.dataset.c !== 'specimenType') empty = false;
     });
     if(empty) continue;
-    /* row's own specimen date/type win; empty falls back to the common defaults */
-    if(!d.specimenDate) delete d.specimenDate;
-    if(!d.specimenType) delete d.specimenType;
     if(!d.patientName){ toast('⚠️ Row ' + (i + 1) + ': patient name required · नाव आवश्यक'); return; }
     var m = (d.mobile || '').replace(/\D/g, '');
     if(m && m.length !== 10){ toast('⚠️ Row ' + (i + 1) + ': mobile must be 10 digits'); return; }
