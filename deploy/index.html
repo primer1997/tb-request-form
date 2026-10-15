@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>NTEP Smart Form — क्षयरोग नमुना तपासणी अर्ज</title>
+<meta name="theme-color" content="#0b3b4a">
+<style>
+/* ============ NTEP SMART FORM — fresh build v1 ============ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0b2239; --navy2:#0e2f4d; --teal:#0e7490; --teal-d:#0c5f78;
+  --emerald:#047857; --emerald-d:#065f46; --gold:#e0aa4e; --gold-d:#c08c2e;
+  --ink:#1e293b; --mut:#64748b; --line:#e2e8f0; --bg:#eef4f2; --card:#ffffff;
+  --red:#b91c1c; --chip:#f1f5f9;
+  --sh:0 10px 30px rgba(11,34,57,.12);
+  --r:16px;
+}
+html{-webkit-text-size-adjust:100%}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Devanagari",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+button{font:inherit;cursor:pointer;border:none;background:none}
+input,select,textarea{font:inherit;width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);transition:border-color .18s,box-shadow .18s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(14,116,144,.15)}
+textarea{min-height:64px;resize:vertical}
+.shell{max-width:660px;margin:0 auto;min-height:100vh;position:relative}
+
+/* ---------- HOME : live hero ---------- */
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#0b2239 0%,#0e4a5e 45%,#046c4e 100%);color:#fff;padding:34px 22px 70px;border-radius:0 0 28px 28px;box-shadow:var(--sh)}
+.hero .bgfx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(46px);opacity:.35;animation:drift 14s ease-in-out infinite alternate}
+.blob.b1{width:220px;height:220px;background:#14b8a6;top:-60px;left:-50px}
+.blob.b2{width:260px;height:260px;background:#0ea5e9;bottom:-90px;right:-60px;animation-delay:-6s}
+.blob.b3{width:150px;height:150px;background:#e0aa4e;top:30%;left:55%;animation-delay:-3s;opacity:.25}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(34px,-26px) scale(1.12)}}
+.ficon{position:absolute;font-size:26px;opacity:.16;animation:rise 11s linear infinite}
+@keyframes rise{from{transform:translateY(120%) rotate(-8deg)}to{transform:translateY(-420px) rotate(10deg)}}
+.hero-in{position:relative;z-index:2}
+.brand-row{display:flex;align-items:center;gap:14px;animation:fadeUp .6s both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.logo{width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg,var(--gold),var(--gold-d));display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 8px 22px rgba(224,170,78,.45);animation:logoPop .7s .1s both cubic-bezier(.34,1.56,.64,1)}
+@keyframes logoPop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.hero h1{font-size:22px;letter-spacing:.2px}
+.hero h1 .mr{display:block;font-size:14px;font-weight:500;color:#fcd9a0;margin-top:3px}
+.hero p.sub{margin-top:10px;font-size:13px;color:#cfe8e2;max-width:46ch;animation:fadeUp .6s .15s both}
+.hero-stats{display:flex;gap:10px;margin-top:18px;position:relative;z-index:2}
+.hstat{flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:10px 12px;backdrop-filter:blur(6px);animation:fadeUp .6s .25s both}
+.hstat b{font-size:20px;display:block}
+.hstat span{font-size:11px;color:#cfe8e2}
+.ecg{margin:14px -22px -70px;position:relative;z-index:2;opacity:.9}
+.ecg svg{display:block;width:100%;height:44px}
+.wave{position:absolute;bottom:-1px;left:0;width:100%;height:34px;z-index:1}
+
+.home-body{padding:20px 16px 110px;margin-top:-34px;position:relative;z-index:3}
+.newbtn{width:100%;padding:16px;border-radius:18px;background:linear-gradient(135deg,var(--gold),var(--gold-d));color:#3d2b05;font-weight:800;font-size:17px;box-shadow:0 12px 28px rgba(224,170,78,.4);display:flex;align-items:center;justify-content:center;gap:10px;animation:fadeUp .6s .3s both;position:relative;overflow:hidden;transition:transform .15s}
+.newbtn:active{transform:scale(.97)}
+.newbtn .shine{position:absolute;top:0;left:-70%;width:50%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:shine 3.2s ease-in-out infinite}
+@keyframes shine{0%,55%{left:-70%}100%{left:130%}}
+.search{margin:16px 0 12px;position:relative;animation:fadeUp .6s .35s both}
+.search input{padding-left:42px;border-radius:14px;box-shadow:var(--sh)}
+.search .ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--mut)}
+.sec-cap{font-size:13px;font-weight:700;color:var(--mut);margin:6px 2px 10px;text-transform:uppercase;letter-spacing:.8px}
+.rec{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:14px;margin-bottom:12px;display:flex;gap:12px;align-items:center;animation:fadeUp .5s both;animation-delay:var(--d,0s)}
+.rec .av{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--teal),var(--emerald));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex:none}
+.rec .meta{flex:1;min-width:0}
+.rec .meta b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec .meta span{font-size:12px;color:var(--mut)}
+.rec .acts{display:flex;gap:6px}
+.iconbtn{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--chip);transition:transform .15s}
+.iconbtn:active{transform:scale(.9)}
+.iconbtn.del{background:#fee2e2}
+.empty{text-align:center;color:var(--mut);padding:44px 20px;font-size:14px;line-height:1.9;background:var(--card);border-radius:var(--r);box-shadow:var(--sh);animation:fadeUp .5s both}
+.empty .big{font-size:44px;display:block;margin-bottom:8px;animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* ---------- WIZARD ---------- */
+.wiz-head{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,#0b2239,#0e4a5e 60%,#046c4e);color:#fff;padding:14px 16px 16px;border-radius:0 0 22px 22px;box-shadow:var(--sh)}
+.wiz-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.wiz-top .back{width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,.14);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center}
+.wiz-top .t{flex:1}
+.wiz-top .t b{font-size:15px;display:block}
+.wiz-top .t span{font-size:11.5px;color:#cfe8e2}
+.stepct{font-size:12px;font-weight:700;background:rgba(255,255,255,.14);padding:5px 12px;border-radius:20px}
+.rail{display:flex;align-items:center;margin:2px 4px 12px}
+.stp{display:flex;flex-direction:column;align-items:center;gap:5px;flex:none;width:56px;cursor:pointer}
+.dot{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .3s;color:#cfe8e2}
+.stp .sl{font-size:9.5px;color:#bcd8d1;text-align:center;line-height:1.25;max-width:60px}
+.stp.done .dot{background:var(--emerald);border-color:#6ee7b7;color:#fff}
+.stp.now .dot{background:linear-gradient(135deg,var(--gold),var(--gold-d));border-color:#fff;color:#3d2b05;transform:scale(1.14);box-shadow:0 0 0 5px rgba(224,170,78,.25)}
+.stp.now .sl{color:#fff;font-weight:700}
+.conn{flex:1;height:3px;background:rgba(255,255,255,.18);border-radius:2px;margin:0 2px 20px;position:relative;overflow:hidden}
+.conn i{position:absolute;inset:0;background:linear-gradient(90deg,var(--emerald),#34d399);border-radius:2px;transform-origin:left;transition:transform .45s cubic-bezier(.4,0,.2,1)}
+.pbar{height:8px;background:rgba(255,255,255,.14);border-radius:6px;overflow:hidden}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#f6d38a);border-radius:6px;transition:width .45s cubic-bezier(.4,0,.2,1);position:relative}
+.pbar i::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);animation:shine 2.4s ease-in-out infinite}
+
+.wiz-body{padding:18px 16px 130px}
+.step-pane{display:none}
+.step-pane.on{display:block;animation:stepIn .38s cubic-bezier(.2,.7,.3,1) both}
+@keyframes stepIn{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:none}}
+.step-pane.back-in{animation:stepInB .38s cubic-bezier(.2,.7,.3,1) both}
+@keyframes stepInB{from{opacity:0;transform:translateX(-46px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:18px;margin-bottom:16px;animation:fadeUp .5s both;animation-delay:var(--d,0s)}
+.sec-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.badge{width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,var(--teal),var(--emerald));color:#fff;font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 6px 14px rgba(14,116,144,.35)}
+.sec-head .tt b{font-size:16px;display:block}
+.sec-head .tt span{font-size:12.5px;color:var(--mut)}
+.sub{font-size:13px;font-weight:800;color:var(--teal-d);margin:16px 0 10px;padding:8px 12px;background:#e6f4f1;border-left:4px solid var(--teal);border-radius:0 10px 10px 0}
+.fld{margin-bottom:14px}
+.lbl{display:block;font-size:13.5px;font-weight:700;margin-bottom:7px;color:var(--ink)}
+.lbl .mr{font-weight:500;color:var(--mut);font-size:12px}
+.req{color:var(--red)}
+.hint{font-size:12px;color:var(--mut);margin-top:5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 15px;border-radius:999px;background:var(--chip);border:1.5px solid var(--line);font-size:13.5px;font-weight:600;color:var(--ink);transition:all .18s;user-select:none}
+.chip:active{transform:scale(.94)}
+.chip.on{background:linear-gradient(135deg,var(--teal),var(--emerald));border-color:transparent;color:#fff;box-shadow:0 5px 14px rgba(14,116,144,.4);animation:chipPop .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes chipPop{from{transform:scale(.82)}to{transform:scale(1)}}
+.chip.radio.on{background:linear-gradient(135deg,#b45309,var(--gold-d));box-shadow:0 5px 14px rgba(192,140,46,.4)}
+.dst-grid{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.dst-row{display:flex;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line)}
+.dst-row:last-child{border-bottom:none}
+.dst-row:nth-child(even){background:#f8fafc}
+.dst-row .dn{flex:1;font-weight:700;font-size:14px}
+.seg{display:flex;background:var(--chip);border-radius:10px;padding:3px;gap:3px}
+.seg button{width:34px;height:30px;border-radius:8px;font-weight:800;font-size:13px;color:var(--mut);transition:all .15s}
+.seg button.s{background:var(--emerald);color:#fff}
+.seg button.r{background:var(--red);color:#fff}
+.seg button.c{background:#d97706;color:#fff}
+.legend{font-size:11.5px;color:var(--mut);margin-top:8px}
+details.acc{border:1.5px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden;background:#fff}
+details.acc summary{list-style:none;cursor:pointer;padding:13px 15px;font-weight:800;font-size:14px;display:flex;align-items:center;gap:10px;background:#f8fafc}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary .arw{margin-left:auto;transition:transform .25s;color:var(--teal)}
+details.acc[open] summary .arw{transform:rotate(90deg)}
+details.acc .acc-body{padding:4px 15px 16px;animation:fadeUp .3s both}
+.export-hint{background:#fffbeb;border:1.5px dashed var(--gold);border-radius:14px;padding:13px 15px;font-size:12.5px;line-height:1.9;color:#7c5a1e;margin-bottom:16px}
+
+/* action bar */
+.abar{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;gap:10px;max-width:660px;margin:0 auto}
+.btn{flex:1;padding:14px;border-radius:15px;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s}
+.btn:active{transform:scale(.96)}
+.btn-pri{background:linear-gradient(135deg,var(--teal),var(--emerald));color:#fff;box-shadow:0 8px 20px rgba(14,116,144,.35)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-d));color:#3d2b05;box-shadow:0 8px 20px rgba(224,170,78,.4)}
+.btn-ghost{background:var(--chip);color:var(--ink)}
+.btn.sm{flex:none;padding:10px 16px;font-size:13.5px}
+
+/* toast + modal */
+#toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:all .3s;z-index:99;max-width:90vw;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.mback{position:fixed;inset:0;background:rgba(11,34,57,.55);backdrop-filter:blur(3px);z-index:90;display:none;align-items:center;justify-content:center;padding:24px}
+.mback.on{display:flex;animation:fadeUp .25s both}
+.modal{background:#fff;border-radius:22px;padding:26px 22px;max-width:380px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3);animation:mPop .3s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes mPop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.modal .mi{font-size:46px;margin-bottom:10px}
+.modal b{font-size:17px;display:block;margin-bottom:6px}
+.modal p{font-size:13.5px;color:var(--mut);margin-bottom:18px;line-height:1.6}
+.modal .row{display:flex;gap:10px}
+.mbtn{flex:1;padding:13px;border-radius:14px;font-weight:800;font-size:14.5px}
+.mbtn.no{background:var(--chip)}
+.mbtn.yes{background:var(--red);color:#fff}
+
+/* ---------- PRINT : official paper layout ---------- */
+#printView{display:none}
+@media print{
+  body{background:#fff}
+  .shell,#toast,.mback{display:none !important}
+  #printView{display:block !important;color:#000}
+}
+.pdoc{font-family:"Noto Sans Devanagari",Arial,sans-serif;font-size:11px;line-height:1.45;color:#000;max-width:100%}
+.pdoc h1{font-size:16px;text-align:center;margin-bottom:2px}
+.pdoc .psub{text-align:center;font-size:11px;margin-bottom:2px}
+.pdoc .pmr{text-align:center;font-size:12px;font-weight:bold;margin-bottom:8px}
+.psec{border:1.5px solid #000;margin-bottom:8px;page-break-inside:avoid}
+.psec>h2{font-size:12px;background:#e8e8e8;padding:4px 8px;border-bottom:1px solid #000;margin:0}
+.prow{display:flex;border-bottom:1px solid #bbb;padding:3px 8px;gap:8px}
+.prow:last-child{border-bottom:none}
+.prow .pl{font-weight:bold;min-width:190px;flex:none}
+.prow .pv{flex:1}
+.pgrid{display:flex;flex-wrap:wrap}
+.pgrid .prow{width:50%}
+.cb{font-size:13px}
+.pfoot{display:flex;justify-content:space-between;margin-top:14px;font-size:11px}
+.pfoot .sig{border-top:1px solid #000;padding-top:4px;width:30%;text-align:center}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+<div class="shell" id="app">
+
+  <!-- ============ HOME ============ -->
+  <div id="homeScreen">
+    <div class="hero">
+      <div class="bgfx" id="heroFx"></div>
+      <div class="hero-in">
+        <div class="brand-row">
+          <div class="logo">🫁</div>
+          <h1>NTEP Smart Form<span class="mr">क्षयरोग नमुना तपासणी स्मार्ट अर्ज</span></h1>
+        </div>
+        <p class="sub">Annexure 15A — Request Form for examination of biological specimen for TB. Fill on your phone, save, and export a print-ready copy.</p>
+        <div class="hero-stats">
+          <div class="hstat"><b id="statTotal">0</b><span>Saved forms<br>जतन केलेले अर्ज</span></div>
+          <div class="hstat"><b id="statMonth">0</b><span>This month<br>या महिन्यात</span></div>
+          <div class="hstat"><b>5</b><span>Steps<br>टप्पे</span></div>
+        </div>
+      </div>
+      <div class="ecg"><svg viewBox="0 0 600 44" preserveAspectRatio="none"><path d="M0,22 L120,22 L140,22 L150,6 L160,36 L170,22 L230,22 L250,22 L262,10 L274,34 L286,22 L360,22 L380,22 L392,4 L404,38 L416,22 L600,22" fill="none" stroke="#e0aa4e" stroke-width="2.5" opacity=".85"/></svg></div>
+      <svg class="wave" viewBox="0 0 600 34" preserveAspectRatio="none"><path d="M0,20 Q150,0 300,18 T600,14 L600,34 L0,34 Z" fill="#eef4f2"/></svg>
+    </div>
+
+    <div class="home-body">
+      <button class="newbtn" id="newFormBtn"><span class="shine"></span>＋ New Form · नवीन अर्ज</button>
+      <div class="search"><span class="ic">🔍</span><input id="searchBox" placeholder="Search by patient name / mobile…"></div>
+      <div class="sec-cap">Saved forms · जतन केलेले अर्ज</div>
+      <div id="formList"></div>
+    </div>
+  </div>
+
+  <!-- ============ WIZARD ============ -->
+  <div id="wizScreen" style="display:none">
+    <div class="wiz-head">
+      <div class="wiz-top">
+        <button class="back" id="wizBack" aria-label="Back">←</button>
+        <div class="t"><b id="wizTitle">Patient Information</b><span id="wizSub">रुग्णाची माहिती</span></div>
+        <div class="stepct" id="stepCt">1 / 5</div>
+      </div>
+      <div class="rail" id="stepRail"></div>
+      <div class="pbar"><i id="pbarFill" style="width:20%"></i></div>
+    </div>
+    <div class="wiz-body" id="wizBody"></div>
+  </div>
+
+  <div class="abar" id="wizActions" style="display:none">
+    <button class="btn btn-ghost" id="prevBtn">← Prev</button>
+    <button class="btn btn-gold" id="saveBtn">💾 Save</button>
+    <button class="btn btn-pri" id="nextBtn">Next →</button>
+  </div>
+</div>
+
+<div class="mback" id="mback"><div class="modal" id="modalBox"></div></div>
+<div id="toast"></div>
+<div id="printView"></div>
+<script>
+"use strict";
+/* ================= NTEP SMART FORM — fresh build ================= */
+var LS_KEY = 'ntep_smart_forms_v1';
+var records = [];
+var editingId = null;
+var curStep = 0;
+var formData = {};
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+
+/* ---------- FIELD SCHEMA ---------- */
+/* t: text|number|tel|email|date|textarea|select|radios|checks|dst
+   half: pair two in a row. sub: subsection header. acc: accordion group */
+var SECTIONS = [
+{ icon:'🧑', title:'Patient Information', mr:'रुग्णाची माहिती', fields:[
+  {sub:'Basic details · मूलभूत माहिती'},
+  {k:'patientName',t:'text',label:'Patient name',mr:'रुग्णाचे नाव',req:1,ph:'Full name'},
+  {k:'age',t:'number',label:'Age',mr:'वय',half:1,min:0,max:130},
+  {k:'gender',t:'radios',label:'Gender',mr:'लिंग',half:1,opts:['M','F','TG']},
+  {k:'mobile',t:'tel',label:'Mobile no.',mr:'मोबाईल नंबर',half:1,maxlength:10,inputmode:'numeric',ph:'10 digits'},
+  {k:'specimenDate',t:'date',label:'Specimen date of collection',mr:'नमुना घेतल्याची तारीख',half:1},
+  {k:'specimenType',t:'radios',label:'Specimen type',mr:'नमुन्याचा प्रकार',opts:['Sputum','Other']},
+  {k:'specimenTypeOther',t:'text',label:'If Other, specify',mr:'इतर असल्यास नमूद करा',ph:'Specify specimen'},
+  {k:'aadhar',t:'tel',label:'Aadhar no. (optional)',mr:'आधार क्रमांक',half:1,maxlength:12,inputmode:'numeric',ph:'12 digits'},
+  {k:'hivStatus',t:'radios',label:'HIV status',mr:'एचआयव्ही स्थिती',half:1,opts:['Reactive','Non-Reactive','Unknown']},
+  {k:'address',t:'textarea',label:'Address with landmark',mr:'पत्ता (खूणेसह)',ph:'Address + landmark'},
+  {sub:'Key populations · मुख्य गट'},
+  {k:'__kp',t:'checks',label:'Select all that apply',opts:[
+    ['kp_contact','Contact of known TB Patient'],['kp_diabetes','Diabetes'],['kp_tobacco','Tobacco'],
+    ['kp_prison','Prison'],['kp_miner','Miner'],['kp_migrant','Migrant'],['kp_refugee','Refugee'],
+    ['kp_slum','Urban slum'],['kp_hcw','Health-care worker'],['kp_other','Other']]},
+  {k:'kp_other_text',t:'text',label:'If Other, specify',ph:'Specify'}
+]},
+{ icon:'🏥', title:'Referring Facility', mr:'संदर्भ देणारी सुविधा', fields:[
+  {k:'facilityName',t:'text',label:'Name of referring facility',mr:'सुविधेचे नाव',ph:'Facility name'},
+  {k:'facilityType',t:'select',label:'Facility type',mr:'सुविधेचा प्रकार',opts:['','PHI','DMC','TU','DTC','ICTC','ART','Medical College','DR-TB Centre','Private','Others']},
+  {k:'healthEstId',t:'text',label:'Health Establishment ID (NIKSHAY)',mr:'निक्षय आरोग्य संस्था आयडी'},
+  {k:'state',t:'text',label:'State',mr:'राज्य',half:1},
+  {k:'district',t:'text',label:'District',mr:'जिल्हा',half:1},
+  {k:'tu',t:'text',label:'Tuberculosis Unit (TU)',mr:'क्षयरोग विभाग'},
+  {k:'episodeId',t:'text',label:'Episode ID',half:1},
+  {k:'testRequestId',t:'text',label:'Test request ID',half:1}
+]},
+{ icon:'🔬', title:'Reason for Testing', mr:'तपासणीचे कारण', fields:[
+  {sub:'A. Diagnosis and follow up of TB'},
+  {k:'antiTBRx',t:'radios',label:'H/O anti TB Rx > 1 month',opts:['Yes','No']},
+  {k:'__tbReason',t:'checks',label:'Reason',opts:[
+    ['tb_presumptive','Presumptive TB'],['tb_repeat','Repeat Exam'],['tb_private','Private referral'],['tb_ntm','Presumptive NTM']]},
+  {k:'symptom',t:'text',label:'Predominant symptom',mr:'मुख्य लक्षण',half:1},
+  {k:'symptomDays',t:'number',label:'Duration (days)',mr:'कालावधी (दिवस)',half:1,min:0},
+  {k:'__fu',t:'checks',label:'Follow-up',opts:[['fu_endip','End IP'],['fu_endcp','End CP']]},
+  {k:'__pt',t:'checks',label:'Post treatment follow-up',opts:[['pt_6m','6m'],['pt_12m','12m'],['pt_18m','18m'],['pt_24m','24m']]},
+  {sub:'B. Diagnosis and follow up — Drug-resistant TB'},
+  {k:'caseType',t:'radios',label:'Case type',opts:['New','Previously treated']},
+  {k:'__drType',t:'checks',label:'Type of case',opts:[['dr_h','H mono/poly TB'],['dr_mdrrr','MDR/RR'],['dr_xdr','XDR TB']]},
+  {k:'__reg',t:'checks',label:'Regimen type',opts:[['reg_alloral_h','All oral H mono/poly TB'],['reg_shorter','Shorter MDR TB regimen'],['reg_longer','All oral longer regimen']]},
+  {k:'__rgComp',t:'checks',label:'Regimen composition',opts:[
+    ['rg_Lfx','Lfx'],['rg_Mfxh','Mfx(h)'],['rg_Bdq','Bdq'],['rg_Lzd','Lzd'],['rg_Cfz','Cfz'],['rg_Cs','Cs'],
+    ['rg_Z','Z'],['rg_E','E'],['rg_Eto','Eto'],['rg_Dlm','Dlm'],['rg_Am','Am'],['rg_Km','Km'],['rg_Cm','Cm'],['rg_Other','Other']]},
+  {k:'rg_Other_text',t:'text',label:'If Other, specify',ph:'Specify'},
+  {k:'treatFuMonths',t:'number',label:'Treatment follow-up (months)',min:0},
+  {sub:'C. Presumptive MDR TB'},
+  {k:'__mdr',t:'checks',label:'Select all that apply',opts:[
+    ['mdr_atdiag','At diagnosis'],['mdr_contact','Contact of MDR/RR TB'],['mdr_smpos','Follow up Sm +ve'],
+    ['mdr_private','Private referral'],['mdr_discord','Discordance resolution']]},
+  {sub:'D. Presumptive H mono/poly'},
+  {k:'__presh',t:'checks',label:'',opts:[['pres_h','Presumptive H mono/poly']]},
+  {sub:'E. Presumptive XDR TB'},
+  {k:'__xdr',t:'checks',label:'Select all that apply',opts:[
+    ['xdr_atdiag','MDR/RR TB at Diagnosis'],['xdr_cultpos','Follow up Culture positive'],
+    ['xdr_fail','Failure or recurrent of MDR/RR-TB regimen'],['xdr_discord','Discordance resolution']]},
+  {k:'xdr_cultpos_months',t:'number',label:'Follow-up culture positive — months',min:0,ph:'Months'}
+]},
+{ icon:'🧪', title:'Test Requested', mr:'विनंती केलेली तपासणी', fields:[
+  {k:'__tests',t:'checks',label:'Select tests requested',opts:[
+    ['t_micro','Microscopy'],['t_tst','TST'],['t_igra','IGRA'],['t_xray','Chest X-ray'],['t_cyto','Cytopathology'],
+    ['t_histo','Histopathology'],['t_cbnaat','CBNAAT'],['t_truenat','TrueNaat'],['t_culture','Culture'],
+    ['t_dst','DST'],['t_fllpa','FL-LPA'],['t_sllpa','SL-LPA'],['t_seq','Gene Sequencing'],['t_other','Other']]},
+  {k:'t_other_text',t:'text',label:'If Other, specify',ph:'Specify'},
+  {k:'requestedBy',t:'text',label:'Requested by (designation)',mr:'विनंती करणारे (पदनाम)'},
+  {k:'reqContact',t:'tel',label:'Contact number',mr:'संपर्क क्रमांक',half:1,maxlength:10,inputmode:'numeric'},
+  {k:'reqEmail',t:'email',label:'Email ID',half:1,ph:'name@example.com'}
+]},
+{ icon:'📋', title:'Lab Results', mr:'प्रयोगशाळा निकाल', lab:1, fields:[
+  {k:'nikshayId',t:'text',label:'NIKSHAY ID Generated',mr:'निक्षय आयडी'},
+  {acc:'Microscopy · सूक्ष्मदर्शिकी', fields:[
+    {k:'microMethod',t:'radios',label:'Method',opts:['ZN','Fluorescent']},
+    {sub:'Sample A'},
+    {k:'microA_srno',t:'text',label:'Lab sr. no.',half:1},
+    {k:'__microAv',t:'checks',label:'Visual appearance',half:1,opts:[['microA_S','S'],['microA_M','M'],['microA_B','B']]},
+    {k:'microA_result',t:'radios',label:'Result',opts:['Negative','Scanty','1+','2+','3+']},
+    {sub:'Sample B'},
+    {k:'microB_srno',t:'text',label:'Lab sr. no.',half:1},
+    {k:'__microBv',t:'checks',label:'Visual appearance',half:1,opts:[['microB_S','S'],['microB_M','M'],['microB_B','B']]},
+    {k:'microB_result',t:'radios',label:'Result',opts:['Negative','Scanty','1+','2+','3+']},
+    {k:'microDateTested',t:'date',label:'Date tested',half:1},
+    {k:'microDateReported',t:'date',label:'Date reported',half:1},
+    {k:'microReportedBy',t:'text',label:'Reported by',half:1},
+    {k:'microLab',t:'text',label:'Laboratory name',half:1}
+  ]},
+  {acc:'NAAT', fields:[
+    {k:'naatSrno',t:'text',label:'Lab serial'},
+    {k:'naatType',t:'radios',label:'Type',half:1,opts:['CBNAAT','TrueNat']},
+    {k:'naatSample',t:'radios',label:'Sample',half:1,opts:['A','B']},
+    {k:'naatMtb',t:'radios',label:'M. Tuberculosis',opts:['Detected','Not Detected','N/A']},
+    {k:'naatRif',t:'radios',label:'Rif Resistance',opts:['Detected','Not Detected','Indeterminate','N/A']},
+    {k:'naatOutcome',t:'radios',label:'Test outcome',opts:['No Result','Invalid','Error']},
+    {k:'naatErrorCode',t:'text',label:'Error code (if Error)',ph:'Error code'}
+  ]},
+  {acc:'Culture · संवर्धन', fields:[
+    {k:'cultureMethod',t:'radios',label:'Method',opts:['LJ','LC']},
+    {sub:'Culture row 1'},
+    {k:'cult1_srno',t:'text',label:'Lab sr. no.'},
+    {k:'cult1_result',t:'radios',label:'Result',opts:['Negative','Positive','NTM','Contamination']},
+    {k:'cult1_species',t:'text',label:'NTM species (if NTM)',ph:'Species'},
+    {sub:'Culture row 2'},
+    {k:'cult2_srno',t:'text',label:'Lab sr. no.'},
+    {k:'cult2_result',t:'radios',label:'Result',opts:['Negative','Positive','NTM','Contamination']},
+    {k:'cult2_species',t:'text',label:'NTM species (if NTM)',ph:'Species'},
+    {k:'cultDateResult',t:'date',label:'Date result',half:1},
+    {k:'cultDateReported',t:'date',label:'Date reported',half:1},
+    {k:'cultReportedBy',t:'text',label:'Reported by',half:1},
+    {k:'cultLab',t:'text',label:'Laboratory name',half:1}
+  ]},
+  {acc:'First line LPA', fields:[
+    {k:'flpaSrno',t:'text',label:'Lab serial'},
+    {k:'flpaType',t:'radios',label:'Type',opts:['Direct','Indirect']},
+    {k:'flpa_R',t:'radios',label:'Rifampicin (R) — resistant',opts:['Yes','Inferred','No']},
+    {k:'flpa_R_remark',t:'text',label:'Remark',ph:'Remark'},
+    {k:'flpa_KatG',t:'radios',label:'Isoniazid (KatG) — resistant',opts:['Yes','Inferred','No']},
+    {k:'flpa_KatG_remark',t:'text',label:'Remark',ph:'Remark'},
+    {k:'flpa_InhA',t:'radios',label:'Isoniazid (InhA) — resistant',opts:['Yes','Inferred','No']},
+    {k:'flpa_InhA_remark',t:'text',label:'Remark',ph:'Remark'}
+  ]},
+  {acc:'Second line LPA', fields:[
+    {k:'slpaSrno',t:'text',label:'Lab serial'},
+    {k:'slpaType',t:'radios',label:'Type',opts:['Direct','Indirect']},
+    {k:'slpa_Lfx',t:'radios',label:'Levofloxacin — resistant',opts:['Yes','Inferred','No']},
+    {k:'slpa_Lfx_remark',t:'text',label:'Remark',ph:'Remark'},
+    {k:'slpa_Mfx',t:'radios',label:'Moxifloxacin — resistant',opts:['Yes','Inferred','No']},
+    {k:'slpa_Mfx_remark',t:'text',label:'Remark',ph:'Remark'},
+    {k:'slpa_Am',t:'radios',label:'Amikacin — resistant',opts:['Yes','Inferred','No']},
+    {k:'slpa_Am_remark',t:'text',label:'Remark',ph:'Remark'},
+    {k:'slpa_Km',t:'radios',label:'Kanamycin — resistant',opts:['Yes','Inferred','No']},
+    {k:'slpa_Km_remark',t:'text',label:'Remark',ph:'Remark'},
+    {k:'slpa_Cm',t:'radios',label:'Capreomycin — resistant',opts:['Yes','Inferred','No']},
+    {k:'slpa_Cm_remark',t:'text',label:'Remark',ph:'Remark'}
+  ]},
+  {acc:'DST · औषध संवेदनशीलता', fields:[
+    {k:'dstSrno',t:'text',label:'Lab sr. no.'},
+    {k:'__dst',t:'dst',label:'Drug susceptibility — tap S / R / C'}
+  ]},
+  {acc:'Other tests · इतर तपासण्या', fields:[
+    {k:'otherTestName',t:'text',label:'Test name'},
+    {k:'otherTestResult',t:'text',label:'Result'},
+    {k:'otherTestDateReported',t:'date',label:'Date reported'},
+    {k:'otherTestReportedBy',t:'text',label:'Reported by',half:1},
+    {k:'otherTestLab',t:'text',label:'Laboratory name',half:1}
+  ]}
+]}
+];
+
+var DST_DRUGS = [
+  ['dst_R','R'],['dst_HinhA','H (inhA)'],['dst_HkatG','H (katG)'],['dst_Z','Z'],['dst_E','E'],['dst_S','S'],
+  ['dst_Km','Km'],['dst_Cm','Cm'],['dst_Am','Am'],['dst_Lfx','Lfx'],['dst_Mfx05','Mfx (0.5)'],
+  ['dst_Mfx1','Mfx (1)'],['dst_Mfx2','Mfx (2)'],['dst_PAS','PAS'],['dst_Lzd','Lzd'],['dst_Cfz','Cfz'],
+  ['dst_Cs','Cs'],['dst_Azi','Azi'],['dst_Bdq','Bdq'],['dst_DLM','DLM'],['dst_Eto','Eto']
+];
+
+/* ================= RENDER ENGINE ================= */
+function toast(msg){
+  var t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+function loadStore(){
+  try{ var r = JSON.parse(localStorage.getItem(LS_KEY)); records = Array.isArray(r) ? r : []; }
+  catch(e){ records = []; }
+}
+function persist(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(records)); }catch(e){} }
+function uid(){ return 's' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function fmtDate(iso){
+  if(!iso) return '—';
+  var d = new Date(iso + (iso.length===10 ? 'T00:00:00' : ''));
+  return isNaN(d) ? iso : d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+function chipGroup(f, val){
+  var isRadio = f.t === 'radios';
+  var cls = 'chip' + (isRadio ? ' radio' : '');
+  var h = '<div class="chips" data-group="'+esc(f.k)+'" data-radio="'+(isRadio?1:0)+'">';
+  f.opts.forEach(function(o){
+    var k, label;
+    if(Array.isArray(o)){ k = o[0]; label = o[1]; } else { k = f.k; label = o; }
+    var cur = isRadio ? val : (formData[k] ? 1 : 0);
+    var on = isRadio ? (val === label) : !!formData[k];
+    h += '<button type="button" class="'+cls+(on?' on':'')+'" data-k="'+esc(k)+'" data-v="'+esc(label)+'">'+esc(label)+'</button>';
+  });
+  return h + '</div>';
+}
+
+function fieldHTML(f, idx){
+  if(f.sub) return '<div class="sub">'+esc(f.sub)+'</div>';
+  if(f.acc){
+    var inner = f.fields.map(function(sf,i){ return fieldHTML(sf, i); }).join('');
+    return '<details class="acc"><summary><span>'+esc(f.acc)+'</span><span class="arw">▶</span></summary><div class="acc-body">'+inner+'</div></details>';
+  }
+  if(f.t === 'dst'){
+    var rows = DST_DRUGS.map(function(d){
+      var v = formData[d[0]] || '';
+      return '<div class="dst-row"><span class="dn">'+esc(d[1])+'</span><div class="seg" data-dst="'+esc(d[0])+'">'
+        + ['S','R','C'].map(function(x){
+            return '<button type="button" data-v="'+x+'" class="'+(v===x?x.toLowerCase():'')+'">'+x+'</button>';
+          }).join('') + '</div></div>';
+    }).join('');
+    return '<div class="fld"><label class="lbl">'+esc(f.label)+'</label><div class="dst-grid">'+rows+'</div>'
+      + '<div class="legend">S: Susceptible · R: Resistant · C: Contaminated · blank: Not done</div></div>';
+  }
+  var v = formData[f.k] || '';
+  var lbl = '<label class="lbl">'+esc(f.label)+(f.mr?' <span class="mr">· '+esc(f.mr)+'</span>':'')+(f.req?' <span class="req">*</span>':'')+'</label>';
+  var attrs = ' data-f="'+esc(f.k)+'"';
+  if(f.ph) attrs += ' placeholder="'+esc(f.ph)+'"';
+  if(f.maxlength) attrs += ' maxlength="'+f.maxlength+'"';
+  if(f.inputmode) attrs += ' inputmode="'+f.inputmode+'"';
+  var inner = '';
+  if(f.t === 'text' || f.t === 'email') inner = '<input type="'+f.t+'"'+attrs+' value="'+esc(v)+'">';
+  else if(f.t === 'number'){
+    inner = '<input type="number"'+attrs+' value="'+esc(v)+'"'+(f.min!=null?' min="'+f.min+'"':'')+(f.max!=null?' max="'+f.max+'"':'')+'>';
+  }
+  else if(f.t === 'tel') inner = '<input type="tel"'+attrs+' value="'+esc(v)+'">';
+  else if(f.t === 'date') inner = '<input type="date"'+attrs+' value="'+esc(v)+'">';
+  else if(f.t === 'textarea') inner = '<textarea'+attrs+'>'+esc(v)+'</textarea>';
+  else if(f.t === 'select'){
+    inner = '<select'+attrs+'><option value="">— Select —</option>' + f.opts.filter(function(o){return o;}).map(function(o){
+      return '<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>';
+    }).join('') + '</select>';
+  }
+  else if(f.t === 'radios' || f.t === 'checks') inner = chipGroup(f, v);
+  var wrap = f.half ? ' style="flex:1;min-width:0"' : '';
+  return '<div class="fld"'+wrap+'>'+lbl+inner+'</div>';
+}
+
+function stepBodyHTML(sec){
+  var h = '', pending = [];
+  sec.fields.forEach(function(f, i){
+    if(f.half && !f.sub && !f.acc){
+      pending.push(fieldHTML(f, i));
+      if(pending.length === 2 || i === sec.fields.length - 1){
+        h += '<div class="grid2" style="display:flex;gap:10px">' + pending.join('') + '</div>';
+        pending = [];
+      }
+    } else {
+      if(pending.length){ h += '<div class="grid2" style="display:flex;gap:10px">' + pending.join('') + '</div>'; pending = []; }
+      h += fieldHTML(f, i);
+    }
+  });
+  return h;
+}
+
+/* ---------- wizard nav ---------- */
+function buildRail(){
+  var rail = $('stepRail'), h = '';
+  SECTIONS.forEach(function(s, i){
+    if(i > 0) h += '<div class="conn"><i id="conn'+i+'" style="transform:scaleX(0)"></i></div>';
+    h += '<div class="stp" data-step="'+i+'"><div class="dot" id="dot'+i+'">'+s.icon+'</div><div class="sl">'+esc(s.mr)+'</div></div>';
+  });
+  rail.innerHTML = h;
+  rail.querySelectorAll('.stp').forEach(function(el){
+    el.addEventListener('click', function(){ goStep(parseInt(el.dataset.step,10)); });
+  });
+}
+
+function collectStep(){
+  var body = $('wizBody');
+  body.querySelectorAll('[data-f]').forEach(function(el){
+    formData[el.dataset.f] = el.value;
+  });
+  // chips + dst handled via listeners directly into formData
+}
+
+function goStep(n, back){
+  collectStep();
+  curStep = Math.max(0, Math.min(SECTIONS.length - 1, n));
+  var sec = SECTIONS[curStep];
+  $('wizTitle').textContent = sec.title;
+  $('wizSub').textContent = sec.mr;
+  $('stepCt').textContent = (curStep + 1) + ' / ' + SECTIONS.length;
+  $('pbarFill').style.width = ((curStep + 1) / SECTIONS.length * 100) + '%';
+  SECTIONS.forEach(function(s, i){
+    var dot = $('dot' + i), stp = dot.parentElement;
+    stp.classList.toggle('now', i === curStep);
+    stp.classList.toggle('done', i < curStep);
+    if(i > 0) $('conn' + i).style.transform = 'scaleX(' + (i <= curStep ? 1 : 0) + ')';
+  });
+  var pane = document.createElement('div');
+  pane.className = 'step-pane on' + (back ? ' back-in' : '');
+  var cardH = '<div class="card" style="--d:.05s"><div class="sec-head"><div class="badge">'+sec.icon
+    + '</div><div class="tt"><b>'+esc(sec.title)+'</b><span>'+esc(sec.mr)+'</span></div></div>'
+    + stepBodyHTML(sec) + '</div>';
+  if(curStep === SECTIONS.length - 1){
+    cardH += '<div class="export-hint">🖨️ <b>PDF</b> → Print → <b>Save as PDF</b> → share on WhatsApp<br>⬇️ <b>Download</b> saves a copy file · ↗️ <b>Share</b> sends it straight to WhatsApp<br><span style="font-size:12px">यादीतून प्रत्येक अर्जासाठी PDF / Download / Share बटणे वापरता येतील.</span></div>';
+  }
+  pane.innerHTML = cardH;
+  var body = $('wizBody');
+  body.innerHTML = '';
+  body.appendChild(pane);
+  bindStepInputs(pane);
+  $('prevBtn').style.visibility = curStep === 0 ? 'hidden' : 'visible';
+  $('nextBtn').innerHTML = curStep === SECTIONS.length - 1 ? '🖨️ Export PDF' : 'Next →';
+  window.scrollTo(0, 0);
+}
+
+function bindStepInputs(root){
+  root.querySelectorAll('.chips').forEach(function(g){
+    g.addEventListener('click', function(e){
+      var b = e.target.closest('button'); if(!b) return;
+      var k = b.dataset.k, v = b.dataset.v;
+      if(g.dataset.radio === '1'){
+        formData[k] = (formData[k] === v) ? '' : v;
+        g.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x === b && !!formData[k]); });
+      } else {
+        formData[k] = !formData[k];
+        b.classList.toggle('on', !!formData[k]);
+      }
+    });
+  });
+  root.querySelectorAll('[data-dst]').forEach(function(seg){
+    seg.addEventListener('click', function(e){
+      var b = e.target.closest('button'); if(!b) return;
+      var k = seg.dataset.dst, v = b.dataset.v;
+      formData[k] = (formData[k] === v) ? '' : v;
+      seg.querySelectorAll('button').forEach(function(x){
+        x.className = (formData[k] === x.dataset.v) ? x.dataset.v.toLowerCase() : '';
+      });
+    });
+  });
+}
+
+function openWizard(id){
+  editingId = id || null;
+  formData = {};
+  curStep = 0;
+  if(id){
+    var rec = records.find(function(r){ return r.id === id; });
+    if(rec) formData = Object.assign({}, rec.data);
+  }
+  $('homeScreen').style.display = 'none';
+  $('wizScreen').style.display = 'block';
+  $('wizActions').style.display = 'flex';
+  goStep(0);
+}
+function closeWizard(){
+  $('wizScreen').style.display = 'none';
+  $('wizActions').style.display = 'none';
+  $('homeScreen').style.display = 'block';
+  editingId = null;
+  renderList($('searchBox').value || '');
+  updateStats();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- validation + save ---------- */
+function validate(){
+  if(!(formData.patientName || '').trim()){ toast('⚠️ Patient name is required · रुग्णाचे नाव आवश्यक'); goStep(0); return false; }
+  var m = (formData.mobile || '').replace(/\D/g, '');
+  if(m && m.length !== 10){ toast('⚠️ Mobile must be 10 digits'); goStep(0); return false; }
+  var a = (formData.aadhar || '').replace(/\D/g, '');
+  if(a && a.length !== 12){ toast('⚠️ Aadhar must be 12 digits'); goStep(0); return false; }
+  var rc = (formData.reqContact || '').replace(/\D/g, '');
+  if(rc && rc.length !== 10){ toast('⚠️ Contact number must be 10 digits'); goStep(3); return false; }
+  return true;
+}
+function saveRecord(silent){
+  collectStep();
+  if(!validate()) return false;
+  var now = new Date().toISOString();
+  if(editingId){
+    var rec = records.find(function(r){ return r.id === editingId; });
+    if(rec){ rec.data = Object.assign({}, formData); rec.updatedAt = now; }
+  } else {
+    editingId = uid();
+    records.push({ id: editingId, data: Object.assign({}, formData), createdAt: now, updatedAt: now });
+  }
+  persist();
+  if(!silent) toast('✅ Form saved · अर्ज जतन झाला');
+  updateStats();
+  return true;
+}
+
+/* ---------- modal ---------- */
+function confirmBox(icon, title, text, yesLabel, cb){
+  var back = $('mback'), box = $('modalBox');
+  box.innerHTML = '<div class="mi">'+icon+'</div><b>'+esc(title)+'</b><p>'+text+'</p>'
+    + '<div class="row"><button class="mbtn no" id="mNo">Cancel</button><button class="mbtn yes" id="mYes">'+esc(yesLabel)+'</button></div>';
+  back.classList.add('on');
+  $('mNo').onclick = function(){ back.classList.remove('on'); };
+  $('mYes').onclick = function(){ back.classList.remove('on'); cb(); };
+}
+
+/* ================= HOME LIST ================= */
+function updateStats(){
+  $('statTotal').textContent = records.length;
+  var mk = new Date().toISOString().slice(0, 7);
+  $('statMonth').textContent = records.filter(function(r){ return (r.createdAt || '').slice(0, 7) === mk; }).length;
+}
+function renderList(q){
+  q = (q || '').trim().toLowerCase();
+  var list = records.filter(function(r){
+    var d = r.data || {};
+    if(!q) return true;
+    return ((d.patientName || '') + ' ' + (d.mobile || '')).toLowerCase().indexOf(q) >= 0;
+  });
+  list.sort(function(a, b){ return (b.updatedAt || '').localeCompare(a.updatedAt || ''); });
+  var box = $('formList');
+  if(!list.length){
+    box.innerHTML = '<div class="empty"><span class="big">🗂️</span>No saved forms yet.<br>Tap <b>＋ New Form</b> to start.<br>अजून कोणताही अर्ज जतन केलेला नाही.</div>';
+    return;
+  }
+  box.innerHTML = list.map(function(r, i){
+    var d = r.data || {};
+    var nm = d.patientName || 'Unnamed';
+    var init = nm.trim().charAt(0).toUpperCase() || '?';
+    return '<div class="rec" style="--d:' + (i * 0.05) + 's"><div class="av">' + esc(init) + '</div>'
+      + '<div class="meta"><b>' + esc(nm) + '</b><span>' + esc(d.mobile || '—') + ' · ' + esc(fmtDate(d.specimenDate)) + '</span></div>'
+      + '<div class="acts">'
+      + '<button class="iconbtn" data-act="edit" data-id="' + r.id + '" title="Edit">✏️</button>'
+      + '<button class="iconbtn" data-act="pdf" data-id="' + r.id + '" title="PDF">🖨️</button>'
+      + '<button class="iconbtn" data-act="dl" data-id="' + r.id + '" title="Download">⬇️</button>'
+      + '<button class="iconbtn" data-act="share" data-id="' + r.id + '" title="Share">↗️</button>'
+      + '<button class="iconbtn del" data-act="del" data-id="' + r.id + '" title="Delete">🗑️</button>'
+      + '</div></div>';
+  }).join('');
+  box.querySelectorAll('[data-act]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var id = b.dataset.id, act = b.dataset.act;
+      if(act === 'edit') openWizard(id);
+      else if(act === 'pdf') exportRecord(id);
+      else if(act === 'dl') downloadRecord(id);
+      else if(act === 'share') shareRecord(id);
+      else if(act === 'del') confirmBox('🗑️', 'Delete this form?', 'हा अर्ज कायमचा हटवायचा का? This cannot be undone.', 'Delete', function(){
+        records = records.filter(function(r){ return r.id !== id; });
+        persist(); renderList($('searchBox').value || ''); updateStats(); toast('🗑️ Deleted');
+      });
+    });
+  });
+}
+
+/* ---------- hero floating icons ---------- */
+function heroFx(){
+  var icons = ['🫁','💊','🧬','🩺','🔬','🧪','❤️','➕'];
+  var box = $('heroFx'), h = '';
+  for(var i = 0; i < 9; i++){
+    var ic = icons[i % icons.length];
+    var left = 4 + Math.random() * 90;
+    var delay = -(Math.random() * 11);
+    var dur = 9 + Math.random() * 6;
+    var size = 20 + Math.random() * 18;
+    h += '<span class="ficon" style="left:' + left + '%;bottom:-40px;font-size:' + size + 'px;animation-duration:' + dur + 's;animation-delay:' + delay + 's">' + ic + '</span>';
+  }
+  box.innerHTML = h;
+}
+
+/* ================= PRINT : official Annexure 15A layout ================= */
+function cb(v){ return v ? '☑' : '☐'; }
+function radioRow(label, val, opts){
+  return '<div class="prow"><span class="pl">' + esc(label) + '</span><span class="pv">'
+    + opts.map(function(o){ return '<span class="cb">' + cb(val === o) + ' ' + esc(o) + '</span>&nbsp;&nbsp;'; }).join('')
+    + '</span></div>';
+}
+function checkRow(label, keys, d){
+  return '<div class="prow"><span class="pl">' + esc(label) + '</span><span class="pv">'
+    + keys.map(function(k){ return '<span class="cb">' + cb(d[k[0]]) + ' ' + esc(k[1]) + '</span>&nbsp;&nbsp;'; }).join('')
+    + (d[keys.textKey] ? ' <i>(' + esc(d[keys.textKey]) + ')</i>' : '')
+    + '</span></div>';
+}
+function prow(label, val){
+  return '<div class="prow"><span class="pl">' + esc(label) + '</span><span class="pv">' + esc(val || '—') + '</span></div>';
+}
+
+function renderPrint(d){
+  d = d || {};
+  var h = '<div class="pdoc">';
+  h += '<h1>NTEP REQUEST FORM FOR EXAMINATION OF BIOLOGICAL SPECIMEN FOR TB</h1>'
+    + '<div class="psub">(Required for Diagnosis of TB, Drug Sensitivity Testing and follow up)</div>'
+    + '<div class="psub"><b>ANNEXURE 15A</b></div>'
+    + '<div class="pmr">क्षयरोग तपासणी विनंती अर्ज</div>';
+
+  /* 2. Patient */
+  h += '<div class="psec"><h2>2. Patient Information · रुग्णाची माहिती</h2>'
+    + prow('Patient name', d.patientName)
+    + '<div class="pgrid">' + prow('Age', d.age) + radioRow('Gender', d.gender, ['M','F','TG']) + '</div>'
+    + '<div class="pgrid">' + prow('Mobile no.', d.mobile) + prow('Specimen date of collection', fmtDate(d.specimenDate)) + '</div>'
+    + radioRow('Specimen type', d.specimenType, ['Sputum','Other']) + (d.specimenTypeOther ? prow('If Other, specify', d.specimenTypeOther) : '')
+    + '<div class="pgrid">' + prow('Aadhar no.', d.aadhar) + radioRow('HIV status', d.hivStatus, ['Reactive','Non-Reactive','Unknown']) + '</div>'
+    + prow('Address with landmark', d.address)
+    + checkRow('Key populations', [['kp_contact','Contact of known TB Patient'],['kp_diabetes','Diabetes'],['kp_tobacco','Tobacco'],['kp_prison','Prison'],['kp_miner','Miner'],['kp_migrant','Migrant'],['kp_refugee','Refugee'],['kp_slum','Urban slum'],['kp_hcw','Health-care worker'],['kp_other','Other']], d)
+    + (d.kp_other_text ? prow('Other (specify)', d.kp_other_text) : '')
+    + '</div>';
+
+  /* 3. Facility */
+  h += '<div class="psec"><h2>3. Referring Facility · संदर्भ देणारी सुविधा</h2>'
+    + prow('Name of referring facility', d.facilityName)
+    + prow('Type (PHI/DMC/TU/DTC/ICTC/ART/Medical College/DR-TB Centre/Private/Others)', d.facilityType)
+    + prow('Health Establishment ID (NIKSHAY)', d.healthEstId)
+    + '<div class="pgrid">' + prow('State', d.state) + prow('District', d.district) + '</div>'
+    + prow('Tuberculosis Unit (TU)', d.tu)
+    + '<div class="pgrid">' + prow('Episode ID', d.episodeId) + prow('Test request ID', d.testRequestId) + '</div></div>';
+
+  /* 4. Reason */
+  h += '<div class="psec"><h2>4. Reason for Testing · तपासणीचे कारण</h2>'
+    + '<div class="prow"><span class="pl"><b>A. Diagnosis and follow up of TB</b></span><span class="pv"></span></div>'
+    + radioRow('H/O anti TB Rx >1 month', d.antiTBRx, ['Yes','No'])
+    + checkRow('Reason', [['tb_presumptive','Presumptive TB'],['tb_repeat','Repeat Exam'],['tb_private','Private referral'],['tb_ntm','Presumptive NTM']], d)
+    + '<div class="pgrid">' + prow('Predominant symptom', d.symptom) + prow('Duration (days)', d.symptomDays) + '</div>'
+    + checkRow('Follow-up', [['fu_endip','End IP'],['fu_endcp','End CP']], d)
+    + checkRow('Post treatment follow-up', [['pt_6m','6m'],['pt_12m','12m'],['pt_18m','18m'],['pt_24m','24m']], d)
+    + '<div class="prow"><span class="pl"><b>B. Drug-resistant TB</b></span><span class="pv"></span></div>'
+    + radioRow('Case type', d.caseType, ['New','Previously treated'])
+    + checkRow('Type of case', [['dr_h','H mono/poly TB'],['dr_mdrrr','MDR/RR'],['dr_xdr','XDR TB']], d)
+    + checkRow('Regimen type', [['reg_alloral_h','All oral H mono/poly TB'],['reg_shorter','Shorter MDR TB regimen'],['reg_longer','All oral longer regimen']], d)
+    + checkRow('Regimen composition', [['rg_Lfx','Lfx'],['rg_Mfxh','Mfx(h)'],['rg_Bdq','Bdq'],['rg_Lzd','Lzd'],['rg_Cfz','Cfz'],['rg_Cs','Cs'],['rg_Z','Z'],['rg_E','E'],['rg_Eto','Eto'],['rg_Dlm','Dlm'],['rg_Am','Am'],['rg_Km','Km'],['rg_Cm','Cm'],['rg_Other','Other']], d)
+    + (d.rg_Other_text ? prow('Other (specify)', d.rg_Other_text) : '')
+    + prow('Treatment follow-up (months)', d.treatFuMonths)
+    + '<div class="prow"><span class="pl"><b>C. Presumptive MDR TB</b></span><span class="pv">'
+    + [['mdr_atdiag','At diagnosis'],['mdr_contact','Contact of MDR/RR TB'],['mdr_smpos','Follow up Sm +ve'],['mdr_private','Private referral'],['mdr_discord','Discordance resolution']].map(function(k){ return '<span class="cb">' + cb(d[k[0]]) + ' ' + esc(k[1]) + '</span>&nbsp;&nbsp;'; }).join('') + '</span></div>'
+    + '<div class="prow"><span class="pl"><b>D. Presumptive H mono/poly</b></span><span class="pv"><span class="cb">' + cb(d.pres_h) + ' Presumptive H mono/poly</span></span></div>'
+    + '<div class="prow"><span class="pl"><b>E. Presumptive XDR TB</b></span><span class="pv">'
+    + [['xdr_atdiag','MDR/RR TB at Diagnosis'],['xdr_cultpos','Follow up Culture positive'],['xdr_fail','Failure or recurrent of MDR/RR-TB regimen'],['xdr_discord','Discordance resolution']].map(function(k){ return '<span class="cb">' + cb(d[k[0]]) + ' ' + esc(k[1]) + '</span>&nbsp;&nbsp;'; }).join('')
+    + (d.xdr_cultpos_months ? ' <i>(Follow-up culture positive — ' + esc(d.xdr_cultpos_months) + ' months)</i>' : '') + '</span></div>'
+    + '</div>';
+
+  /* 5. Tests */
+  h += '<div class="psec"><h2>5. Test Requested · विनंती केलेली तपासणी</h2>'
+    + checkRow('Tests', [['t_micro','Microscopy'],['t_tst','TST'],['t_igra','IGRA'],['t_xray','Chest X-ray'],['t_cyto','Cytopathology'],['t_histo','Histopathology'],['t_cbnaat','CBNAAT'],['t_truenat','TrueNaat'],['t_culture','Culture'],['t_dst','DST'],['t_fllpa','FL-LPA'],['t_sllpa','SL-LPA'],['t_seq','Gene Sequencing'],['t_other','Other']], d)
+    + (d.t_other_text ? prow('Other (specify)', d.t_other_text) : '')
+    + prow('Requested by (designation)', d.requestedBy)
+    + '<div class="pgrid">' + prow('Contact number', d.reqContact) + prow('Email ID', d.reqEmail) + '</div></div>';
+
+  /* 6. Lab */
+  h += '<div class="psec"><h2>6. Results — प्रयोगशाळा विभाग (For laboratory use)</h2>'
+    + prow('NIKSHAY ID Generated', d.nikshayId)
+    + '<div class="prow"><span class="pl"><b>Microscopy</b></span><span class="pv"></span></div>'
+    + radioRow('Method', d.microMethod, ['ZN','Fluorescent'])
+    + '<div class="prow"><span class="pl"><b>Sample A</b></span><span class="pv"></span></div>'
+    + '<div class="pgrid">' + prow('Lab sr. no.', d.microA_srno)
+    + '<div class="prow"><span class="pl">Visual appearance</span><span class="pv"><span class="cb">' + cb(d.microA_S) + ' S</span>&nbsp;<span class="cb">' + cb(d.microA_M) + ' M</span>&nbsp;<span class="cb">' + cb(d.microA_B) + ' B</span></span></div></div>'
+    + radioRow('Result', d.microA_result, ['Negative','Scanty','1+','2+','3+'])
+    + '<div class="prow"><span class="pl"><b>Sample B</b></span><span class="pv"></span></div>'
+    + '<div class="pgrid">' + prow('Lab sr. no.', d.microB_srno)
+    + '<div class="prow"><span class="pl">Visual appearance</span><span class="pv"><span class="cb">' + cb(d.microB_S) + ' S</span>&nbsp;<span class="cb">' + cb(d.microB_M) + ' M</span>&nbsp;<span class="cb">' + cb(d.microB_B) + ' B</span></span></div></div>'
+    + radioRow('Result', d.microB_result, ['Negative','Scanty','1+','2+','3+'])
+    + '<div class="pgrid">' + prow('Date tested', fmtDate(d.microDateTested)) + prow('Date reported', fmtDate(d.microDateReported)) + '</div>'
+    + '<div class="pgrid">' + prow('Reported by', d.microReportedBy) + prow('Laboratory name', d.microLab) + '</div>'
+    + '<div class="prow"><span class="pl"><b>NAAT</b></span><span class="pv"></span></div>'
+    + prow('Lab serial', d.naatSrno)
+    + '<div class="pgrid">' + radioRow('Type', d.naatType, ['CBNAAT','TrueNat']) + radioRow('Sample', d.naatSample, ['A','B']) + '</div>'
+    + radioRow('M. Tuberculosis', d.naatMtb, ['Detected','Not Detected','N/A'])
+    + radioRow('Rif Resistance', d.naatRif, ['Detected','Not Detected','Indeterminate','N/A'])
+    + radioRow('Test outcome', d.naatOutcome, ['No Result','Invalid','Error'])
+    + (d.naatErrorCode ? prow('Error code', d.naatErrorCode) : '')
+    + '<div class="prow"><span class="pl"><b>Culture</b></span><span class="pv"></span></div>'
+    + radioRow('Method', d.cultureMethod, ['LJ','LC'])
+    + '<div class="prow"><span class="pl"><b>Row 1</b></span><span class="pv"></span></div>'
+    + prow('Lab sr. no.', d.cult1_srno) + radioRow('Result', d.cult1_result, ['Negative','Positive','NTM','Contamination'])
+    + (d.cult1_species ? prow('NTM species', d.cult1_species) : '')
+    + '<div class="prow"><span class="pl"><b>Row 2</b></span><span class="pv"></span></div>'
+    + prow('Lab sr. no.', d.cult2_srno) + radioRow('Result', d.cult2_result, ['Negative','Positive','NTM','Contamination'])
+    + (d.cult2_species ? prow('NTM species', d.cult2_species) : '')
+    + '<div class="pgrid">' + prow('Date result', fmtDate(d.cultDateResult)) + prow('Date reported', fmtDate(d.cultDateReported)) + '</div>'
+    + '<div class="pgrid">' + prow('Reported by', d.cultReportedBy) + prow('Laboratory name', d.cultLab) + '</div>'
+    + '<div class="prow"><span class="pl"><b>First line LPA</b></span><span class="pv"></span></div>'
+    + prow('Lab serial', d.flpaSrno) + radioRow('Type', d.flpaType, ['Direct','Indirect'])
+    + radioRow('Rifampicin (R) — resistant', d.flpa_R, ['Yes','Inferred','No']) + (d.flpa_R_remark ? prow('Remark', d.flpa_R_remark) : '')
+    + radioRow('Isoniazid (KatG) — resistant', d.flpa_KatG, ['Yes','Inferred','No']) + (d.flpa_KatG_remark ? prow('Remark', d.flpa_KatG_remark) : '')
+    + radioRow('Isoniazid (InhA) — resistant', d.flpa_InhA, ['Yes','Inferred','No']) + (d.flpa_InhA_remark ? prow('Remark', d.flpa_InhA_remark) : '')
+    + '<div class="prow"><span class="pl"><b>Second line LPA</b></span><span class="pv"></span></div>'
+    + prow('Lab serial', d.slpaSrno) + radioRow('Type', d.slpaType, ['Direct','Indirect']);
+  [['slpa_Lfx','Levofloxacin'],['slpa_Mfx','Moxifloxacin'],['slpa_Am','Amikacin'],['slpa_Km','Kanamycin'],['slpa_Cm','Capreomycin']].forEach(function(x){
+    h += radioRow(x[1] + ' — resistant', d[x[0]], ['Yes','Inferred','No']) + (d[x[0] + '_remark'] ? prow('Remark', d[x[0] + '_remark']) : '');
+  });
+  h += '<div class="prow"><span class="pl"><b>DST</b></span><span class="pv"></span></div>'
+    + prow('Lab sr. no.', d.dstSrno)
+    + '<div class="prow"><span class="pl">Drug susceptibility<br><small>(S: Susceptible, R: Resistant, C: Contaminated, —: Not done)</small></span><span class="pv">'
+    + DST_DRUGS.map(function(x){ return '<span class="cb">' + esc(x[1]) + ': <b>' + esc(d[x[0]] || '—') + '</b></span>&nbsp;&nbsp;'; }).join('')
+    + '</span></div>'
+    + '<div class="prow"><span class="pl"><b>Other tests</b></span><span class="pv"></span></div>'
+    + prow('Test name', d.otherTestName) + prow('Result', d.otherTestResult)
+    + prow('Date reported', fmtDate(d.otherTestDateReported))
+    + '<div class="pgrid">' + prow('Reported by', d.otherTestReportedBy) + prow('Laboratory name', d.otherTestLab) + '</div>'
+    + '</div>';
+
+  h += '<div class="pfoot"><div class="sig">Signature of requesting MO/Staff<br>विनंती करणाऱ्याची सही</div>'
+    + '<div class="sig">Date / दिनांक: ___________</div>'
+    + '<div class="sig">Laboratory seal & signature<br>प्रयोगशाळा शिक्का व सही</div></div>';
+  h += '</div>';
+  return h;
+}
+
+/* ================= EXPORT ================= */
+function printRecord(data, name){
+  var pv = $('printView');
+  pv.innerHTML = renderPrint(data);
+  void pv.offsetHeight;
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      setTimeout(function(){ window.print(); }, 350);
+    });
+  });
+}
+function exportRecord(id){
+  var rec = records.find(function(r){ return r.id === id; });
+  if(!rec){ toast('⚠️ Record not found'); return; }
+  printRecord(rec.data);
+}
+function standaloneHTML(data, name){
+  var css = 'body{font-family:Arial,sans-serif;padding:18px;color:#000}.pdoc{font-size:11px;line-height:1.45}'
+    + 'h1{font-size:16px;text-align:center}.psub,.pmr{text-align:center;margin-bottom:4px}.pmr{font-weight:bold}'
+    + '.psec{border:1.5px solid #000;margin-bottom:8px}.psec>h2{font-size:12px;background:#e8e8e8;padding:4px 8px;border-bottom:1px solid #000;margin:0}'
+    + '.prow{display:flex;border-bottom:1px solid #bbb;padding:3px 8px;gap:8px}.pl{font-weight:bold;min-width:190px;flex:none}.pv{flex:1}'
+    + '.pgrid .prow{width:50%;box-sizing:border-box}.pgrid{display:flex;flex-wrap:wrap}.pfoot{display:flex;justify-content:space-between;margin-top:14px}'
+    + '.sig{border-top:1px solid #000;padding-top:4px;width:30%;text-align:center}';
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>NTEP Form — ' + esc(name || 'record') + '</title>'
+    + '<style>' + css + '</style></head><body>' + renderPrint(data) + '</body></html>';
+}
+function downloadRecord(id){
+  var rec = records.find(function(r){ return r.id === id; });
+  if(!rec) return;
+  var name = (rec.data.patientName || 'ntep-form').replace(/[^\w\u0900-\u097F\- ]+/g, '').trim() || 'ntep-form';
+  var blob = new Blob([standaloneHTML(rec.data, name)], { type: 'text/html;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'NTEP-Form-' + name + '.html';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 800);
+  toast('⬇️ Copy saved · प्रत जतन झाली');
+}
+function shareRecord(id){
+  var rec = records.find(function(r){ return r.id === id; });
+  if(!rec) return;
+  var name = (rec.data.patientName || 'ntep-form').replace(/[^\w\u0900-\u097F\- ]+/g, '').trim() || 'ntep-form';
+  var file = new File([standaloneHTML(rec.data, name)], 'NTEP-Form-' + name + '.html', { type: 'text/html' });
+  if(navigator.canShare && navigator.canShare({ files: [file] })){
+    navigator.share({ files: [file], title: 'NTEP Request Form' }).catch(function(){});
+  } else {
+    toast('⚠️ Share not supported — use Download');
+  }
+}
+
+/* ================= WIRING ================= */
+function init(){
+  loadStore();
+  heroFx();
+  buildRail();
+  renderList('');
+  updateStats();
+
+  $('newFormBtn').addEventListener('click', function(){ openWizard(null); });
+  $('searchBox').addEventListener('input', function(){ renderList($('searchBox').value); });
+  $('wizBack').addEventListener('click', function(){
+    if(curStep === 0) closeWizard(); else goStep(curStep - 1, true);
+  });
+  $('prevBtn').addEventListener('click', function(){ goStep(curStep - 1, true); });
+  $('nextBtn').addEventListener('click', function(){
+    if(curStep < SECTIONS.length - 1) goStep(curStep + 1);
+    else { if(saveRecord()){ var rec = records.find(function(r){ return r.id === editingId; }); printRecord(rec.data); } }
+  });
+  $('saveBtn').addEventListener('click', function(){ saveRecord(); });
+  // export buttons appear on the last step via context menu: long-press save = download/share
+  $('saveBtn').addEventListener('contextmenu', function(e){ e.preventDefault(); });
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
