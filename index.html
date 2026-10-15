@@ -79,6 +79,20 @@ textarea{min-height:64px;resize:vertical}
 .empty .big{font-size:44px;display:block;margin-bottom:8px;animation:bob 3s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
+/* ---------- BULK ENTRY ---------- */
+.bulkbtn{width:100%;margin-top:10px;padding:14px;border-radius:18px;background:#fff;border:2px dashed var(--teal);color:var(--teal-d);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:var(--sh);transition:transform .15s;animation:fadeUp .6s .32s both}
+.bulkbtn:active{transform:scale(.97)}
+.bulk-wrap{overflow-x:auto;margin:0 -6px;padding:2px 6px 8px;-webkit-overflow-scrolling:touch}
+.bulk-table{border-collapse:collapse;min-width:820px;width:100%}
+.bulk-table th{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);text-align:left;padding:6px 4px;white-space:nowrap}
+.bulk-table td{padding:3px;vertical-align:middle}
+.bulk-table .rn{font-weight:800;color:var(--mut);font-size:13px;text-align:center;min-width:26px}
+.bulk-table input,.bulk-table select{padding:9px 8px;font-size:13.5px;border-radius:10px}
+.bulk-del{width:34px;height:34px;border-radius:10px;background:#fee2e2;font-size:14px;display:flex;align-items:center;justify-content:center}
+.bk-checks{display:flex;flex-wrap:wrap;gap:8px}
+.bk-checks label{display:flex;align-items:center;gap:7px;background:var(--chip);padding:9px 13px;border-radius:11px;font-size:13.5px;font-weight:600;cursor:pointer}
+.bk-checks input{width:auto;accent-color:var(--teal);padding:0}
+
 /* ---------- WIZARD ---------- */
 .wiz-head{position:sticky;top:0;z-index:20;background-color:#0e3f55;background-image:linear-gradient(135deg,#0b2239,#0e4a5e 60%,#046c4e);color:#fff;padding:14px 16px 16px;border-radius:0 0 22px 22px;box-shadow:var(--sh)}
 .wiz-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
@@ -292,6 +306,7 @@ html,body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
     <div class="home-body">
       <button class="newbtn" id="newFormBtn"><span class="shine"></span>＋ New Form · नवीन अर्ज</button>
+      <button class="bulkbtn" id="bulkBtn">📋 Bulk entry · एकाच वेळी अनेक रुग्ण</button>
       <div class="search"><span class="ic">🔍</span><input id="searchBox" placeholder="Search by patient name / mobile…"></div>
       <div class="sec-cap">Saved forms · जतन केलेले अर्ज</div>
       <div id="formList"></div>
@@ -316,6 +331,51 @@ html,body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
     <button class="btn btn-ghost" id="prevBtn">← Prev</button>
     <button class="btn btn-gold" id="saveBtn">💾 Save</button>
     <button class="btn btn-pri" id="nextBtn">Next →</button>
+  </div>
+
+  <!-- ============ BULK ENTRY ============ -->
+  <div id="bulkScreen" style="display:none">
+    <div class="wiz-head">
+      <div class="wiz-top">
+        <button class="back" id="bulkBack" aria-label="Back">←</button>
+        <div class="t"><b>Bulk Entry</b><span>एकाच वेळी अनेक रुग्ण · Multi-patient</span></div>
+      </div>
+    </div>
+    <div class="wiz-body">
+      <div class="card" style="--d:.05s">
+        <div class="sec-head"><div class="badge">🏥</div><div class="tt"><b>Common details</b><span>सर्व रुग्णांसाठी समान माहिती</span></div></div>
+        <div class="grid2">
+          <div class="fld"><label class="lbl">Facility name <span class="mr">सुविधेचे नाव</span></label><input id="bk_facilityName" placeholder="Facility name"></div>
+          <div class="fld"><label class="lbl">Facility type <span class="mr">सुविधेचा प्रकार</span></label><select id="bk_facilityType"><option value=""></option><option>PHI</option><option>DMC</option><option>TU</option><option>DTC</option><option>ICTC</option><option>ART</option><option>Medical College</option><option>DR-TB Centre</option><option>Private</option><option>Others</option></select></div>
+          <div class="fld"><label class="lbl">Specimen date <span class="mr">नमुना तारीख</span></label><input type="date" id="bk_specimenDate"></div>
+          <div class="fld"><label class="lbl">Specimen type <span class="mr">नमुन्याचा प्रकार</span></label><select id="bk_specimenType"><option>Sputum</option><option>Other</option></select></div>
+          <div class="fld"><label class="lbl">Requested by <span class="mr">विनंती करणारे (पदनाम)</span></label><input id="bk_requestedBy" placeholder="Designation"></div>
+          <div class="fld"><label class="lbl">Contact number <span class="mr">संपर्क क्रमांक</span></label><input id="bk_reqContact" inputmode="numeric" maxlength="10" placeholder="10 digits"></div>
+        </div>
+        <div class="fld"><label class="lbl">Tests requested <span class="mr">तपासण्या</span></label>
+          <div class="bk-checks" id="bk_tests">
+            <label><input type="checkbox" value="t_micro" checked> Microscopy</label>
+            <label><input type="checkbox" value="t_cbnaat" checked> CBNAAT</label>
+            <label><input type="checkbox" value="t_truenat"> TrueNat</label>
+            <label><input type="checkbox" value="t_xray"> Chest X-ray</label>
+            <label><input type="checkbox" value="t_culture"> Culture</label>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="--d:.1s">
+        <div class="sec-head"><div class="badge">🧑</div><div class="tt"><b>Patients</b><span>प्रत्येक ओळीत एक रुग्ण · one patient per row</span></div></div>
+        <div class="bulk-wrap"><table class="bulk-table">
+          <thead><tr><th>#</th><th>Patient name *</th><th>Age</th><th>Gender</th><th>Mobile</th><th>Aadhar</th><th>Address</th><th>Symptom</th><th>Days</th><th></th></tr></thead>
+          <tbody id="bulkBody"></tbody>
+        </table></div>
+        <button class="btn btn-ghost" id="bulkAddRow" type="button" style="margin-top:10px">＋ Add row · ओळ जोडा</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="abar" id="bulkActions" style="display:none">
+    <button class="btn btn-ghost" id="bulkCancel">← Cancel</button>
+    <button class="btn btn-pri" id="bulkSave">💾 Save all · सर्व जतन करा</button>
   </div>
 </div>
 
@@ -854,6 +914,86 @@ function saveRecord(silent){
   return true;
 }
 
+/* ---------- bulk entry : multi-patient table ---------- */
+function bulkRowHTML(){
+  return '<tr>'
+  + '<td class="rn"></td>'
+  + '<td><input data-c="patientName" placeholder="Full name *"></td>'
+  + '<td><input data-c="age" type="number" min="0" max="130" placeholder="Age" style="width:62px"></td>'
+  + '<td><select data-c="gender" style="width:64px"><option value=""></option><option>M</option><option>F</option><option>TG</option></select></td>'
+  + '<td><input data-c="mobile" inputmode="numeric" maxlength="10" placeholder="10 digits" style="width:104px"></td>'
+  + '<td><input data-c="aadhar" inputmode="numeric" maxlength="12" placeholder="12 digits" style="width:112px"></td>'
+  + '<td><input data-c="address" placeholder="Address + landmark" style="width:150px"></td>'
+  + '<td><input data-c="symptom" placeholder="Symptom" style="width:110px"></td>'
+  + '<td><input data-c="symptomDays" type="number" min="0" placeholder="Days" style="width:60px"></td>'
+  + '<td><button type="button" class="bulk-del" data-del="1" aria-label="Delete row">✕</button></td>'
+  + '</tr>';
+}
+function renumberBulk(){
+  var trs = $('bulkBody').rows;
+  for(var i = 0; i < trs.length; i++) trs[i].cells[0].textContent = i + 1;
+}
+function bulkAddRow(){
+  $('bulkBody').insertAdjacentHTML('beforeend', bulkRowHTML());
+  renumberBulk();
+}
+function openBulk(){
+  $('homeScreen').style.display = 'none';
+  $('wizScreen').style.display = 'none';
+  $('wizActions').style.display = 'none';
+  $('bulkScreen').style.display = 'block';
+  $('bulkActions').style.display = 'flex';
+  $('bk_facilityName').value = facility.name || '';
+  $('bk_facilityType').value = facility.type || '';
+  $('bk_specimenDate').value = new Date().toISOString().slice(0, 10);
+  $('bulkBody').innerHTML = '';
+  for(var i = 0; i < 5; i++) bulkAddRow();
+  window.scrollTo(0, 0);
+}
+function closeBulk(){
+  $('bulkScreen').style.display = 'none';
+  $('bulkActions').style.display = 'none';
+  $('homeScreen').style.display = 'block';
+  renderList($('searchBox').value || '');
+  updateStats();
+  window.scrollTo(0, 0);
+}
+function bulkSave(){
+  var common = {
+    facilityName: $('bk_facilityName').value.trim(),
+    facilityType: $('bk_facilityType').value,
+    specimenDate: $('bk_specimenDate').value,
+    specimenType: $('bk_specimenType').value,
+    requestedBy: $('bk_requestedBy').value.trim(),
+    reqContact: $('bk_reqContact').value.replace(/\D/g, ''),
+    tb_presumptive: true
+  };
+  $('bk_tests').querySelectorAll('input[type=checkbox]').forEach(function(c){ if(c.checked) common[c.value] = true; });
+  if(common.reqContact && common.reqContact.length !== 10){ toast('⚠️ Contact number must be 10 digits'); return; }
+  var trs = $('bulkBody').rows, saved = 0, now = new Date().toISOString();
+  for(var i = 0; i < trs.length; i++){
+    var d = {}, empty = true;
+    trs[i].querySelectorAll('[data-c]').forEach(function(el){
+      var v = el.value.trim(); d[el.dataset.c] = v; if(v) empty = false;
+    });
+    if(empty) continue;
+    if(!d.patientName){ toast('⚠️ Row ' + (i + 1) + ': patient name required · नाव आवश्यक'); return; }
+    var m = (d.mobile || '').replace(/\D/g, '');
+    if(m && m.length !== 10){ toast('⚠️ Row ' + (i + 1) + ': mobile must be 10 digits'); return; }
+    var a = (d.aadhar || '').replace(/\D/g, '');
+    if(a && a.length !== 12){ toast('⚠️ Row ' + (i + 1) + ': aadhar must be 12 digits'); return; }
+    var rec = { id: uid(), data: Object.assign({}, common, d), createdAt: now, updatedAt: now };
+    records.push(rec);
+    cloudUpsert(rec);
+    saved++;
+  }
+  if(!saved){ toast('⚠️ No patient rows filled · एकही ओळ भरलेली नाही'); return; }
+  persist();
+  updateStats();
+  toast('✅ ' + saved + ' forms saved · ' + saved + ' अर्ज जतन झाले');
+  closeBulk();
+}
+
 /* ---------- modal ---------- */
 function confirmBox(icon, title, text, yesLabel, cb){
   var back = $('mback'), box = $('modalBox');
@@ -1225,6 +1365,16 @@ function init(){
   updateStats();
 
   $('newFormBtn').addEventListener('click', function(){ openWizard(null); });
+  $('bulkBtn').addEventListener('click', openBulk);
+  $('bulkBack').addEventListener('click', closeBulk);
+  $('bulkCancel').addEventListener('click', closeBulk);
+  $('bulkAddRow').addEventListener('click', bulkAddRow);
+  $('bulkSave').addEventListener('click', bulkSave);
+  $('bulkBody').addEventListener('click', function(e){
+    var b = e.target.closest('[data-del]'); if(!b) return;
+    var tr = b.closest('tr'); if(tr && $('bulkBody').rows.length > 1){ tr.remove(); renumberBulk(); }
+    else toast('⚠️ At least one row is needed');
+  });
   $('searchBox').addEventListener('input', function(){ renderList($('searchBox').value); });
   $('wizBack').addEventListener('click', function(){
     if(curStep === 0) closeWizard(); else goStep(curStep - 1, true);
